@@ -1,4 +1,4 @@
-package com.plixo.ui.elements;
+package de.plixo.ui.elements;
 
 /**
  *  Event interface for standard event handling in Guis
@@ -17,12 +17,7 @@ public interface IGuiEvent {
     default void mouseReleased(float mouseX, float mouseY, int state) {
     }
 
-    @Deprecated
     default void init() {
-    }
-
-    @Deprecated
-    default void close() {
     }
 
     default void onTick() {

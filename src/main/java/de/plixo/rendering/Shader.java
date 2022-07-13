@@ -1,10 +1,13 @@
 package de.plixo.rendering;
 
+import de.plixo.general.Color;
+import de.plixo.general.reference.Reference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -34,8 +37,13 @@ public class Shader {
 
         final int linked = glGetProgrami(program, GL_LINK_STATUS);
         final String programLog = glGetProgramInfoLog(program);
-        if (programLog.trim().length() > 0) System.err.println(programLog);
-        if (linked == 0) throw new AssertionError("Could not link program");
+        if (programLog.trim().length() > 0) {
+            System.err.println(programLog);
+            System.exit(-1);
+            throw new RuntimeException(programLog);
+        }
+        if (linked == 0)
+            throw new AssertionError("Could not link program");
 
         final Shader shader = new Shader();
         shader.program = program;
@@ -56,8 +64,13 @@ public class Shader {
 
         final int compiled = glGetShaderi(shader, GL_COMPILE_STATUS);
         final String log = glGetShaderInfoLog(shader);
-        if (log.trim().length() > 0) System.err.println(log);
-        if (compiled == 0) throw new AssertionError("Could not compile shader: " + src);
+        if (log.trim().length() > 0) {
+            System.err.println(log);
+            System.exit(-1);
+            throw new RuntimeException(log);
+        }
+        if (compiled == 0)
+            throw new AssertionError("Could not compile shader: " + src);
 
         return shader;
     }
@@ -100,17 +113,28 @@ public class Shader {
 
         Object t;
 
-        public void load(Matrix4f t) {
+        public void loadReference(@Nullable Reference<?> ref) {
+            this.t = ref;
+            linkShader();
+        }
+
+
+        public void load(@Nullable Matrix4f t) {
             this.t = t;
             linkShader();
         }
 
-        public void load(Vector3f t) {
+        public void load(@Nullable Vector3f t) {
             this.t = t;
             linkShader();
         }
 
-        public void load(Vector2f t) {
+        public void load(@Nullable Color t) {
+            this.t = t;
+            linkShader();
+        }
+
+        public void load(@Nullable Vector2f t) {
             this.t = t;
             linkShader();
         }
@@ -124,26 +148,34 @@ public class Shader {
             this.shader.uniforms.add(this);
         }
 
-        public void flush() {
-            if (t == null) {
+        private void flush() {
+            boolean isRef = t instanceof Reference<?>;
+
+            Object upload = this.t;
+            if (upload == null) {
                 return;
+            } else if (isRef) {
+                upload = ((Reference<?>) t).getValue();
+            } else {
+                this.t = null;
             }
             shader.bind();
-            if (t instanceof Matrix4f matrix) {
+            if (upload instanceof Matrix4f matrix) {
                 try (final MemoryStack stack = MemoryStack.stackPush()) {
                     glUniformMatrix4fv(location, false, matrix.get(stack.mallocFloat(16)));
                 }
-            } else if (t instanceof Vector3f vector) {
+            } else if (upload instanceof Color color) {
+                glUniform4fv(location, color.toArray());
+            } else if (upload instanceof Vector3f vector) {
                 glUniform3f(location, vector.x, vector.y, vector.z);
-            } else if (t instanceof Vector2f vector) {
+            } else if (upload instanceof Vector2f vector) {
                 glUniform2f(location, vector.x, vector.y);
-            } else if (t instanceof Float float_) {
+            } else if (upload instanceof Float float_) {
                 glUniform1f(location, float_);
             } else {
-                throw new UnsupportedOperationException("cant upload from object " + t.getClass());
+                throw new UnsupportedOperationException("cant upload from object " + upload.getClass());
             }
 
-            t = null;
         }
     }
 

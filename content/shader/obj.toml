@@ -1,0 +1,27 @@
+version = 330
+profile = "core"
+
+[layout]
+aPos = "vec3"
+aTex = "vec2"
+aNormal = "vec3"
+
+[uniform]
+model = "mat4"
+projview = "mat4"
+tex0 = "sampler2D"
+
+[fragment]
+output = { out_color = "vec4" }
+source = '''
+        out_color = texture(tex0,tex);
+'''
+
+[vertex]
+output = { light = "float", tex = "vec2", normal = "vec3" }
+
+source = '''
+    gl_Position = projview * model * vec4(aPos, 1.0);
+    tex = aTex;
+    normal = aNormal;
+'''

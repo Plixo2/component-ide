@@ -1,0 +1,28 @@
+version = 330
+profile = "core"
+
+[layout]
+aPos = "vec3"
+aTex = "vec2"
+aLight = "float"
+
+[uniform]
+model = "mat4"
+projview = "mat4"
+tex0 = "sampler2D"
+
+[fragment]
+output = { out_color = "vec4" }
+source = '''
+//     out_color = vec4(238.0/255.0,108/255.0,69/255.0,1.0) * vec4(light,light,light,1.0);
+        out_color = texture(tex0,tex);
+'''
+
+[vertex]
+output = { light = "float", tex = "vec2" }
+
+source = '''
+    gl_Position = projview * model * vec4(aPos, 1.0);
+    light = aLight;
+    tex = aTex;
+'''

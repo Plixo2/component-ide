@@ -1,7 +1,7 @@
-package com.plixo.ui.resource.util;
+package de.plixo.ui.resource.util;
 
 
-import com.plixo.util.Util;
+import de.plixo.general.Util;
 
 public class SimpleSlider {
     public float value = 0;

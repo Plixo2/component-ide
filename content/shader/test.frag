@@ -10,5 +10,6 @@ out vec4 outColor;
 
 void main() {
 //    FragColor = col;
-    outColor = texture(sampler1,tex_coords);
+//    outColor = texture(sampler1,tex_coords);
+    outColor = vec4(1.0,0.0,0.4,1.0);
 }

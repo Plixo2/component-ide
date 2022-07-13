@@ -25,7 +25,7 @@ public class Dispatcher {
                 try {
                     ref.method.invoke(ref.object, event);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             });
         }
@@ -35,7 +35,8 @@ public class Dispatcher {
         final Class<?> clazz = object.getClass();
         for (Method method : clazz.getDeclaredMethods()) {
             if (method.getParameterCount() != 1 || !method.isAnnotationPresent(SubscribeEvent.class) ||
-                    Modifier.isStatic(method.getModifiers())) continue;
+                    Modifier.isStatic(method.getModifiers()))
+                continue;
 
             final Parameter parameter = method.getParameters()[0];
             final Class<?> input = parameter.getType();
@@ -53,7 +54,8 @@ public class Dispatcher {
     public static <T> void registerStatic(@NotNull Class<T> clazz) {
         for (Method method : clazz.getDeclaredMethods()) {
             if (method.getParameterCount() != 1 || !method.isAnnotationPresent(SubscribeEvent.class) ||
-                    !Modifier.isStatic(method.getModifiers())) continue;
+                    !Modifier.isStatic(method.getModifiers()))
+                continue;
 
 
             final Parameter parameter = method.getParameters()[0];

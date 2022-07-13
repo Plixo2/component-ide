@@ -1,6 +1,8 @@
 package de.plixo.general;
 
 
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.plixo.gsonplus.ExposeField;
 
 public class Color {
@@ -28,6 +30,19 @@ public class Color {
                 r << 16 |
                 g << 8 |
                 b;
+    }
+
+
+//    public Vector3f toVec3() {
+//        return new Vector3f(red()/255f,green()/255f,blue()/255f);
+//    }
+
+//    public Vector4f toVec4() {
+//        return new Vector4f(red()/255f,green()/255f,blue()/255f,alpha()/255f);
+//    }
+
+    public float[] toArray() {
+        return new float[] {red()/255f,green()/255f,blue()/255f,alpha()/255f};
     }
 
     public Color(int r, int g, int b) {

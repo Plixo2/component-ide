@@ -1,0 +1,27 @@
+version = 330
+profile = "core"
+
+[layout]
+aPos = "vec3"
+aCol = "vec3"
+aTex = "vec2"
+
+[uniform]
+model = "mat4"
+view = "mat4"
+projection = "mat4"
+
+[fragment]
+output = { out_color = "vec4" }
+source = '''
+     out_color = vec4(1.0,0.0,0.4,1.0);
+'''
+
+[vertex]
+output = { col = "vec4", tex_coords = "vec2" }
+
+source = '''
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    tex_coords = aTex;
+    col = vec4(aCol,1.0);
+'''

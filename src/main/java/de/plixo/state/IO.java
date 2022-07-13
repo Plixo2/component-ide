@@ -1,7 +1,7 @@
 package de.plixo.state;
 
 import de.plixo.event.SubscribeEvent;
-import de.plixo.event.impl.MouseEvent;
+import de.plixo.event.impl.MouseMoveEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +12,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class IO {
     @Getter
     @Setter
-    private static Vector2d mouse;
+    private static Vector2d mouse = new Vector2d();
 
 
     public static boolean mouseDown(int key) {
@@ -25,7 +25,7 @@ public class IO {
 
 
     @SubscribeEvent
-    static void mouse(@NotNull MouseEvent event) {
+    static void mouse(@NotNull MouseMoveEvent event) {
         mouse = new Vector2d(event.mouse());
     }
 }

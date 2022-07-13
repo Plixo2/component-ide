@@ -3,7 +3,7 @@ package de.plixo.general.reference;
 
 public class ObjectReference<O> extends Reference<O> {
 
-    public O object;
+    private O object;
 
     @Override
     public O getValue() {

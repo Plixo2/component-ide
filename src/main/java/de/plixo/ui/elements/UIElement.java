@@ -1,14 +1,16 @@
-package com.plixo.ui.elements;
+package de.plixo.ui.elements;
 
 
-import com.plixo.ui.*;
-import com.plixo.ui.elements.canvas.UICanvas;
-import com.plixo.util.Color;
-import com.plixo.util.Util;
-
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import de.plixo.general.Color;
+import de.plixo.general.Util;
+import de.plixo.ui.general.ColorLib;
+import de.plixo.ui.interfaces.IKeyboard;
+import de.plixo.ui.interfaces.IMouse;
+import de.plixo.ui.interfaces.IRenderer;
+import lombok.Getter;
+import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Default ui class, updates
@@ -16,121 +18,114 @@ import java.util.function.Supplier;
  **/
 public abstract class UIElement implements IGuiEvent {
 
-    public static IRenderer gui;
-    public static IKeyboard keyboard;
-    public static IMouse mouse;
+    public static IRenderer GUI;
+    public static IKeyboard KEYBOARD;
+    public static IMouse MOUSE;
+
+    public static float HOVER_SPEED = 0.7f;
+
+    public static float DEFAULT_ROUNDNESS = 3;
+
+    public static int DEFAULT_COLOR = ColorLib.getBackground(0.8f);
+    public static int DEFAULT_OUTLINE_COLOR = 0x55000000;
+    public static int DEFAULT_HOVER_COLOR = 0x23000000;
+    public static int DEFAULT_SELECTION_COLOR = 0;
 
 
     public float height, width;
     public float x, y;
+
+    @Getter
     float hoverProgress = 0;
-    Runnable onTick;
-    Supplier<?> cursorObject;
-    Runnable action;
-    Runnable option;
-    Runnable mouseOver;
-    Consumer<DropTarget> dropTarget;
-    Supplier<DropTarget> startDragging;
-    boolean dragging = false;
+    @Getter
+    @Setter
+    @Nullable Runnable onTick = null;
+
+    @Getter
+    @Setter
+    @Nullable Runnable action = null;
+    @Getter
+    @Setter
+    @Nullable Runnable option = null;
+    @Getter
+    boolean dragged = false;
+
+    @Getter
+    @Setter
+    boolean selected = false;
+
+    @Getter
+    @Setter
+    int selectionOutlineColor = 0;
+
     int alignment = 0;
 
+    @Getter
+    @Setter
     float roundness = 0;
-    int color = ColorLib.getBackground(0.2f);
 
+    @Getter
+    @Setter
+    int color = 0;
+
+    @Getter
+    @Setter
     float outlineWidth = 0;
-    int outlineColor = 0x55000000;
 
-    int normalHoverColor = 0x23000000;
-    float hoverSpeed = 1;
+    @Getter
+    @Setter
+    int outlineColor = 0;
 
-    String displayName;
-    String hoverName;
+    @Getter
+    @Setter
+    int hoverColor = 0;
+    @Getter
+    @Setter
+    @Nullable String displayName = null;
+    @Getter
+    @Setter
+    @Nullable String hoverName = null;
     long lastMs = 0;
 
     public UIElement() {
-        setRoundness(2);
+        super();
+        setRoundness(DEFAULT_ROUNDNESS);
+        setColor(DEFAULT_COLOR);
+        setOutlineColor(DEFAULT_OUTLINE_COLOR);
+        setHoverColor(DEFAULT_HOVER_COLOR);
+        setSelectionOutlineColor(DEFAULT_SELECTION_COLOR);
+        init();
     }
 
-    public void drawScreen(float mouseX, float mouseY) {
-        base(mouseX, mouseY);
+    public abstract void drawScreen(float mouseX, float mouseY);
+
+    protected void defaults(float mouseX, float mouseY) {
+        defaultBackground();
+        defaultOutline();
+        defaultHover();
+        defaultUpdate(mouseX, mouseY);
     }
 
-    public void onTick() {
-        if (onTick != null) {
-            onTick.run();
-        }
-    }
-
-    public void mouseClicked(float mouseX, float mouseY, int mouseButton) {
-        if (isHovered(mouseX, mouseY)) {
-            if (mouseButton == 0) {
-                dragging = true;
-                if(startDragging != null) {
-                    DropTarget.currentDropTarget = startDragging.get();
-                }
-                if (action != null) {
-                    action.run();
-                }
-            } else if (mouseButton == 1) {
-                if (option != null) {
-                    option.run();
-                }
-                if (cursorObject != null) {
-                    Object run = cursorObject.get();
-                    if (run != null) {
-                        IOObject.draggedObject = run;
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void mouseReleased(float mouseX, float mouseY, int state) {
-        dragging = false;
-       if(isHovered(mouseX, mouseY) && state == 0) {
-           if(dropTarget != null) {
-               if(DropTarget.currentDropTarget != null) {
-                   dropTarget.accept(DropTarget.currentDropTarget);
-                   DropTarget.currentDropTarget = null;
-               }
-           }
-       }
-    }
-
-    public void updateHoverProgress(float mouseX, float mouseY) {
-        long delta = System.currentTimeMillis() - lastMs;
-        if (!isHovered(mouseX, mouseY)) {
-            delta = -delta;
-        }
-        delta *= hoverSpeed;
-
-        hoverProgress = (float) Util.clampDouble(hoverProgress + delta, 100, 0);
-        lastMs = System.currentTimeMillis();
-    }
-
-    public void setDimensions(float x, float y, float width, float height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-
-    public void copyDimensions(UIElement element) {
-        setDimensions(element.x,element.y,element.width,element.height);
-    }
-    public void scaleDimensions(UIElement element) {
-        setDimensions(this.x,this.y,element.width,element.height);
-    }
-
-    public void base(float mouseX, float mouseY) {
+    protected void defaultUpdate(float mouseX, float mouseY) {
         updateHoverProgress(mouseX, mouseY);
-        if (mouseOver != null) {
-            mouseOver.run();
-        }
+        drawName(mouseX, mouseY);
+        if (isSelected()) drawOutline(selectionOutlineColor);
     }
 
-    public void drawName(float mouseX, float mouseY) {
+    protected void defaultHover() {
+        final int computedHoverColor = getComputedHoverColor();
+        drawDefault(computedHoverColor);
+    }
+
+    protected void defaultBackground() {
+        drawDefault(getColor());
+    }
+
+    protected void defaultOutline() {
+        drawOutline(getOutlineColor());
+    }
+
+    private void drawName(float mouseX, float mouseY) {
         if (hoverName != null) {
             if (isHovered(mouseX, mouseY)) {
                 drawName(hoverName);
@@ -142,192 +137,101 @@ public abstract class UIElement implements IGuiEvent {
         }
     }
 
-    private void drawName(String name) {
-        drawName(name,alignment);
+    private void drawName(@NotNull String name) {
+        drawName(name, alignment);
     }
 
-    private void drawName(String name , int alignment) {
-        if (alignment == -1) {
-            gui.drawStringWithShadow(name, x + 3, y + height / 2, ColorLib.getTextColor());
-        } else if (alignment == 1) {
-            gui.drawStringWithShadow(name, x + width - (gui.getStringWidth(name)+3), y + height / 2, ColorLib.getTextColor());
-        } else {
-            gui.drawCenteredStringWithShadow(name, x + width / 2, y + height / 2, ColorLib.getTextColor());
+    public void onTick() {
+        if (onTick != null) {
+            onTick.run();
         }
     }
 
-
-    public void drawDefault() {
-        drawDefault(getColor());
-        drawOutline();
-    }
-
-    public void drawDefault(int color) {
-        gui.drawRoundedRect(x, y, x + width, y + height, getRoundness(), color);
-    }
-    public void drawOutline() {
-        drawOutline(getOutlineColor());
-    }
-
-    public void drawOutline(int color) {
-        if(getOutlineWidth() > 0.01) {
-            gui.drawLinedRoundedRect(x, y, x + width, y + height, getRoundness(),color , getOutlineWidth());
+    public void mouseClicked(float mouseX, float mouseY, int mouseButton) {
+        this.selected = this.isHovered(mouseX, mouseY);
+        if (isHovered(mouseX, mouseY)) {
+            if (mouseButton == 0) {
+                dragged = true;
+                if (action != null) {
+                    action.run();
+                }
+            } else if (mouseButton == 1) {
+                if (option != null) {
+                    option.run();
+                }
+            }
         }
     }
 
-    public void drawHoverEffect() {
-        drawDefault(getHoverColor());
+    @Override
+    public void mouseReleased(float mouseX, float mouseY, int state) {
+        dragged = false;
+    }
+
+    public void updateHoverProgress(float mouseX, float mouseY) {
+        long delta = System.currentTimeMillis() - lastMs;
+        if (!isHovered(mouseX, mouseY)) {
+            delta = -delta;
+        }
+        delta *= HOVER_SPEED;
+
+        hoverProgress = Util.clampFloat(hoverProgress + delta, 100, 0);
+        lastMs = System.currentTimeMillis();
+    }
+
+    public void setDimensions(float x, float y, float width, float height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
     }
 
 
-    public boolean isHovered(float mouseX, float mouseY) {
+    protected boolean isHovered(float mouseX, float mouseY) {
         return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height;
     }
 
-    public int getHoverColor() {
-        return Color.interpolateColorAlpha(0x00000000, normalHoverColor, hoverProgress / 100f);
+    protected int getComputedHoverColor() {
+        return Color.interpolateColorAlpha(0, hoverColor, hoverProgress / 100f);
     }
 
-    public void setDisplayName(String name) {
-        this.displayName = name;
-    }
-
-    public void setHoverName(String name) {
-        this.hoverName = name;
-    }
-
-    public void setRoundness(float roundness) {
-        this.roundness = roundness;
-    }
-
-    public void setCursorObject(Supplier<?> getObject) {
-        this.cursorObject = getObject;
-    }
-
-    public void setTickAction(Runnable runnable) {
-        this.onTick = runnable;
-    }
-
-    public void setAction(Runnable runnable) {
-        action = runnable;
-    }
-
-    public void setColor(int color) {
-        this.color = color;
-    }
-
-    public void alignLeft() {
+    public void alignTextLeft() {
         alignment = -1;
     }
 
-    public void alignMiddle() {
+    public void alignTextMiddle() {
         alignment = 0;
     }
 
-    public void alignRight() {
+    public void alignTextRight() {
         alignment = 1;
     }
 
-    public String getDisplayName() {
-        return displayName;
+
+    public void copyDimensions(@NotNull UIElement element) {
+        setDimensions(element.x, element.y, element.width, element.height);
     }
 
-    public String getHoverName() {
-        return hoverName;
-    }
-
-    public float getRoundness() {
-        return roundness;
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public float getOutlineWidth() {
-        return outlineWidth;
-    }
-
-    public void setOutlineWidth(float outlineWidth) {
-        this.outlineWidth = outlineWidth;
-    }
-
-    public void setOutlineColor(int outlineColor) {
-        this.outlineColor = outlineColor;
-    }
-
-    public int getOutlineColor() {
-        return outlineColor;
-    }
-
-    public void setOption(Runnable option) {
-        this.option = option;
-    }
-
-    public Runnable getOption() {
-        return option;
-    }
-
-    public Runnable getAction() {
-        return action;
-    }
-
-    public float getHoverProgress() {
-        return hoverProgress;
-    }
-
-    public int getNormalHoverColor() {
-        return normalHoverColor;
-    }
-
-    public void setNormalHoverColor(int normalHoverColor) {
-        this.normalHoverColor = normalHoverColor;
-    }
-
-    public void setHoverSpeed(float hoverSpeed) {
-        this.hoverSpeed = hoverSpeed;
-    }
-
-    public float getHoverSpeed() {
-        return hoverSpeed;
-    }
-
-    public void setMouseOver(Runnable mouseOver) {
-        this.mouseOver = mouseOver;
-    }
-
-    public Runnable getMouseOver() {
-        return mouseOver;
-    }
-
-    public void onDrop(Consumer<DropTarget> dropTarget) {
-        this.dropTarget = dropTarget;
-    }
-
-    public Consumer<DropTarget> getDropTarget() {
-        return dropTarget;
-    }
-
-    public void setDragging(boolean dragging) {
-        this.dragging = dragging;
-    }
-
-    public boolean isDragging() {
-        return dragging;
-    }
-
-    public void setDropTarget(Supplier<DropTarget> startDragging) {
-        this.startDragging = startDragging;
+    private void drawName(@NotNull String name, int alignment) {
+        if (alignment == -1) {
+            GUI.drawStringWithShadow(name, x + 3, y + height / 2, ColorLib.getTextColor());
+        } else if (alignment == 1) {
+            GUI.drawStringWithShadow(name, x + width - (GUI.getStringWidth(name) + 3), y + height / 2,
+                    ColorLib.getTextColor());
+        } else {
+            GUI.drawCenteredStringWithShadow(name, x + width / 2, y + height / 2, ColorLib.getTextColor());
+        }
     }
 
 
-    public UIElement border(float size , int color) {
-        UICanvas canvas = new UICanvas();
-        canvas.setDimensions(x-size,y-size,width+size*2,height+size*2);
-        canvas.add(this);
-        canvas.setColor(color);
-        return canvas;
+    public void drawDefault(int color) {
+        GUI.drawRoundedRect(x, y, x + width, y + height, roundness, color);
     }
 
 
+    public void drawOutline(int color) {
+        if (outlineWidth > 0.01) {
+            GUI.drawLinedRoundedRect(x, y, x + width, y + height, roundness, color, outlineWidth);
+        }
+    }
 }

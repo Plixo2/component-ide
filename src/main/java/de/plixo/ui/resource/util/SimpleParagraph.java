@@ -1,4 +1,4 @@
-package com.plixo.ui.resource.util;
+package de.plixo.ui.resource.util;
 
 public class SimpleParagraph {
     public String value = "";

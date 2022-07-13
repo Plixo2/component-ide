@@ -18,6 +18,7 @@ public class ExposedReference<O> extends Reference<O> {
     @Override
     public void setValue(O value) {
         this.value = value;
+        super.setValue(value);
     }
 
     public ExposedReference(O value) {
