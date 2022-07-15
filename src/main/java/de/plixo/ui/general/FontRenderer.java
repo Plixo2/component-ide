@@ -2,7 +2,6 @@ package de.plixo.ui.general;
 
 
 import de.plixo.rendering.Texture;
-import de.plixo.ui.impl.UI;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -153,8 +152,8 @@ public class FontRenderer {
             }
 
             fontTexture = Texture.fromBufferedImg(imgTemp, new Texture.ImgConfig(true, false, false));
-            final File output = new File("content/font.png");
-            ImageIO.write(imgTemp, "png", output);
+//            final File output = new File("content/font.png");
+//            ImageIO.write(imgTemp, "png", output);
 //            Desktop.getDesktop().open(output);
 
 
@@ -218,10 +217,8 @@ public class FontRenderer {
         float blue = (float) (color & 255) / 255.0f;
         glColor4f(red, green, blue, alpha);
 
-//        fontTexture.bind();
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//        glEnable(GL_BLEND);
 
         int totalWidth = 0;
         for (int i = 0; i < str.length(); i++) {
@@ -233,15 +230,12 @@ public class FontRenderer {
                 final int width = metric.width;
                 final int height = metric.height;
                 if ((i >= startIndex) || (i <= endIndex)) {
-//                    UIElement.GUI.drawRect((x + totalWidth), y, (x + totalWidth + width), (y + height), color);
-                    if(shadow) {
-                        glColor4f(0.1f, 0.1f,0.1f,1f);
+                    if (shadow) {
                         fontTexture.drawStatic((x + totalWidth) + 2, y + 2, (x + totalWidth + width), (y + height),
-                                metric.uvX / (float)textureWidth,
-                                metric.uvY / (float)textureHeight,
-                                (metric.uvX + width)/ (float)textureWidth,
-                                (metric.uvY + height) / (float)textureHeight, -1);
-                        glColor4f(red, green, blue, alpha);
+                                metric.uvX / (float) textureWidth,
+                                metric.uvY / (float) textureHeight,
+                                (metric.uvX + width) / (float) textureWidth,
+                                (metric.uvY + height) / (float) textureHeight, 0xFF000000);
                     }
 //
 //                    drawQuad((x + totalWidth), y, (x + totalWidth + width), (y + height), metric.uvX,
@@ -250,16 +244,14 @@ public class FontRenderer {
 //                    UIElement.GUI.drawRect((x + totalWidth),y ,  (x + totalWidth + width), (y + height) , color);
 //
                     fontTexture.drawStatic((x + totalWidth), y, (x + totalWidth + width), (y + height),
-                            metric.uvX / (float)textureWidth,
-                            metric.uvY / (float)textureHeight,
-                            (metric.uvX + width)/ (float)textureWidth,
-                            (metric.uvY + height) / (float)textureHeight, -1);
+                            metric.uvX / (float) textureWidth,
+                            metric.uvY / (float) textureHeight,
+                            (metric.uvX + width) / (float) textureWidth,
+                            (metric.uvY + height) / (float) textureHeight, color);
 
                 }
                 totalWidth += width;
             }
         }
-//        glEnd();
-//        glDisable(GL_TEXTURE_2D);
     }
 }

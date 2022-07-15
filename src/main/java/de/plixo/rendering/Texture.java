@@ -40,7 +40,7 @@ public class Texture {
 
 
     public static Texture fromFile(@NotNull String path, @NotNull ImgConfig imgConfig) throws IOException {
-        final BufferedImage read = ImageIO.read(new File(path));
+        final BufferedImage read = ImageIO.read(new File( path));
         return fromBufferedImg(read, imgConfig);
     }
 

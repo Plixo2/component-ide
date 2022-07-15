@@ -1,12 +1,11 @@
-package de.plixo.game;
+package de.plixo.state;
 
-import de.javagl.obj.*;
 import de.plixo.event.SubscribeEvent;
 import de.plixo.event.impl.PostInitEvent;
+import de.plixo.game.AtlasGen;
+import de.plixo.game.BlockMesh;
 import de.plixo.game.impl.Wool;
-import de.plixo.general.Color;
 import de.plixo.general.Tuple;
-import de.plixo.general.dsa.Dsa;
 import de.plixo.rendering.Mesh;
 import de.plixo.rendering.Texture;
 import de.plixo.rendering.blockrendering.BlockRenderer;
@@ -18,16 +17,10 @@ import org.joml.Vector2i;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MeshRegistry {
     private static final HashMap<Class<?>, BlockMesh> registeredMeshes = new HashMap<>();
@@ -36,6 +29,7 @@ public class MeshRegistry {
     private static final ArrayList<BufferedImage> atlasTextures = new ArrayList<>();
 
     private static Tuple<HashMap<BufferedImage, Vector2i>, Texture> atlasEntries;
+/*
 
     static float vertices[] = {
             0, 0, 0, 1.0f, 0.0f, 0.9f,
@@ -88,82 +82,13 @@ public class MeshRegistry {
             23, 21, 20,
             23, 22, 21,
     };
-
-
-    private static Mesh block;
-
+*/
 
     @SubscribeEvent
     public static void register(@NotNull PostInitEvent event) throws IOException {
-
-        BufferedImage simple = ImageIO.read(new File("content/textures/exp.png"));
-        atlasTextures.add(simple);
-        BufferedImage test0 = ImageIO.read(new File("content/packtest/beehive_front_honey.png"));
-        atlasTextures.add(test0);
-
-        generateAtlas();
-        final AtlasGen.AtlasEntry simpleEntry = atlasEntry(simple);
-        final AtlasGen.AtlasEntry test0Entry = atlasEntry(test0);
-
-
-//        block = Mesh.from_raw(injectUVs(vertices, 3, 4, simpleEntry), indices, new Shader.Attribute[]{
-//                Shader.Attribute.Vec3,
-//                Shader.Attribute.Vec2,
-//                Shader.Attribute.Float
-//                ,});
-
-
-//        val shader = Dsa.compileToShader("content/shader/box.toml").second;
-//        final Texture texture = Texture.fromFile("content/textures/exp.png", new Texture.ImgConfig(true, false,
-//        true));
-//        registeredMeshes.put(Simple.class, new BlockMesh(Color.WHITE, shader,
-//                new Texture[]{simpleEntry.atlas()}, new Mesh[]{block}));
-
-        InputStream inputStream = new FileInputStream("content/pipe.obj");
-        final List<Mtl> read = MtlReader.read(new FileInputStream("content/pipe.mtl"));
-        val map = new HashMap<String,Mtl>();
-        for (Mtl mtl : read) {
-            System.out.println(mtl.getName());
-            map.put(mtl.getName(), mtl);
-        }
-        val full_obj = ObjUtils.convertToRenderable(
-                ObjReader.read(inputStream));
-        val stringObjMap = ObjSplitting.splitByMaterialGroups(full_obj);
-        val shader_obj = Dsa.compileToShader("content/shader/obj.toml").second;
-        val objs = new RenderObj[stringObjMap.size()];
-        val index = new AtomicInteger();
-
-        stringObjMap.forEach((mat, obj) -> {
-            IntBuffer indices = ObjData.getFaceVertexIndices(obj);
-            FloatBuffer vertices = ObjData.getVertices(obj);
-            FloatBuffer texCoords = ObjData.getTexCoords(obj, 2);
-            FloatBuffer normals = ObjData.getNormals(obj);
-
-            val mesh = Mesh.from_buffers(indices, vertices, texCoords, normals, 0.5f);
-            final Texture texture;
-            try {
-                var path = "content/textures/" + mat + ".png";
-                val file = new File(path);
-                if(!file.exists()) {
-                    final Mtl mtl = map.get(mat);
-                    assert mtl != null : mat;
-                    path = mtl.getMapKd();
-                }
-
-                texture = Texture.fromFile(path, new Texture.ImgConfig(true, false,
-                        false));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            val renderObj = new RenderObj(shader_obj, texture, mesh);
-            objs[index.getAndIncrement()] = renderObj;
-        });
-        registeredMeshes.put(Wool.class, new BlockMesh(Color.WHITE, objs));
-
-//        registeredRenderers.put(Simple.class, new SimpleRenderer(meshByClass(Simple.class).shader()));
-        registeredRenderers.put(Wool.class, new SimpleRenderer(shader_obj));
-
-
+        final var value = BlockMesh.generate("cube.obj", "cube.mtl", "obj.toml", 0);
+        registeredMeshes.put(Wool.class, value.first);
+        registeredRenderers.put(Wool.class, new SimpleRenderer(value.second));
     }
 
     private static float[] injectUVs(float @NotNull [] uvs, int base, int offset,
@@ -195,7 +120,7 @@ public class MeshRegistry {
         return renderer;
     }
 
-    private static void generateAtlas() {
+/*    private static void generateAtlas() {
         val generate = AtlasGen.generate(atlasTextures, 64);
         atlasEntries = new Tuple<>();
         atlasEntries.first = generate.first;
@@ -221,5 +146,5 @@ public class MeshRegistry {
                 img.getWidth() / atlas_size,
                 img.getHeight() / atlas_size);
 
-    }
+    }*/
 }

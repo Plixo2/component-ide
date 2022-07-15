@@ -20,4 +20,6 @@ public interface Storage3D<T> {
 
     void insert(@Nullable T obj, int x, int y, int z);
 
+    int size();
+
 }

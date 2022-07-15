@@ -10,6 +10,7 @@ import lombok.Getter;
 
 import java.util.Stack;
 
+import static de.plixo.state.Window.UI_SCALE;
 import static org.lwjgl.opengl.GL11.*;
 
 public class MainWindow implements IGuiEvent {
@@ -111,7 +112,7 @@ public class MainWindow implements IGuiEvent {
 
         glEnable(GL_SCISSOR_TEST);
         ((OpenGlRenderer) UIElement.GUI).scissorStack.clear();
-        UIElement.GUI.pushScissor(0, 0, width * 2f, height * 2f);
+        UIElement.GUI.pushScissor(0, 0, width * UI_SCALE, height * UI_SCALE);
 //        UIElement.GUI.drawRect(0, 0, width, height, 0xFF00FF00);
         stack.forEach(ref -> ref.internal.drawScreen(mouseX, mouseY));
         glDisable(GL_SCISSOR_TEST);

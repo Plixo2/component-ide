@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 import java.nio.FloatBuffer;
 import java.util.Stack;
 
+import static de.plixo.state.Window.UI_SCALE;
 import static org.lwjgl.opengl.GL11.*;
 
 
@@ -296,6 +297,7 @@ public class OpenGlRenderer implements IRenderer {
         while (i < to) {
             glVertex2d(x + Math.sin(i * toRadiant) * radius, y + Math.cos(i * toRadiant) * radius);
             i += 9;
+            glVertex2d(x + Math.sin(i * toRadiant) * radius, y + Math.cos(i * toRadiant) * radius);
         }
         glEnd();
         reset();
@@ -366,14 +368,37 @@ public class OpenGlRenderer implements IRenderer {
 
 
     private void createScissorBox(float x, float y, float x2, float y2) {
-
         float wDiff = x2 - x;
         float hDiff = y2 - y;
         if (wDiff < 0 || hDiff < 0) {
             return;
         }
-        float bottomY = (MainWindow.INSTANCE.getHeight()* 2f) - y2;
-        glScissor(Math.round(x), Math.round(bottomY), Math.round(wDiff), Math.round(hDiff));
+
+//        final var realH = MainWindow.INSTANCE.getHeight();
+//        float bottomY = realH - (y2 * UI_SCALE);
+
+//
+//        float realX = x * UI_SCALE;
+//        float realY = y * UI_SCALE;
+//        float realX2 = x2 * UI_SCALE;
+//        float realY2 = y2 * UI_SCALE;
+//
+//        float realW = realX2 - realX;
+//        float realH = realY2 - realY;
+//
+//        GL11.glPushMatrix();
+//        glMatrixMode(GL_MODELVIEW);
+//        glLoadIdentity();
+//        drawLinedRect(x,y,x2,y2,-1,1);
+//        GL11.glPopMatrix();
+
+        float bottomY = (MainWindow.INSTANCE.getHeight() * UI_SCALE) - y2;
+        glScissor(Math.round(x),
+                Math.round(bottomY),
+                Math.round(wDiff),
+                Math.round(hDiff));
+
+
     }
 
 
@@ -392,6 +417,7 @@ public class OpenGlRenderer implements IRenderer {
     }
 
     static float scale = 0.5f;
+
     @Override
     public void drawCenteredString(String text, float x, float y, int color) {
 
@@ -451,6 +477,7 @@ public class OpenGlRenderer implements IRenderer {
                 modelViewMatrix[0] * modelViewMatrix[0] + modelViewMatrix[1] * modelViewMatrix[1] +
                         modelViewMatrix[2] * modelViewMatrix[2]);
     }
+
     static long delta = 0;
 
     @Override

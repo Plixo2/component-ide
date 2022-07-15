@@ -5,7 +5,7 @@ import de.plixo.ui.elements.layout.UIAlign;
 import de.plixo.ui.elements.layout.UICanvas;
 import de.plixo.ui.elements.layout.UISpacer;
 import de.plixo.ui.elements.other.UIPopup;
-import de.plixo.ui.elements.visuals.UILabel;
+import de.plixo.ui.elements.visuals.UIEmpty;
 import de.plixo.ui.general.ColorLib;
 import de.plixo.ui.general.MainWindow;
 import org.apache.commons.lang3.function.TriFunction;
@@ -32,7 +32,7 @@ public class UIMenu extends UICanvas {
 
         final UIElement uiElement = makeObject(topLevelEntry, width, height, false, objectFunction);
 
-        UILabel head = new UILabel();
+        UIEmpty head = new UIEmpty();
         head.setDimensions(0, 0, width, height);
         head.setDisplayName(topLevelEntry.name());
         head.setColor(ColorLib.getBackground(0.4f));
@@ -54,7 +54,7 @@ public class UIMenu extends UICanvas {
                                             @NotNull TriFunction<O, Float, Float, UIElement> objectFunction) {
         if (entry instanceof MenuList<O> list) {
             UIAlign align = new UIAlign();
-            UILabel head = new UILabel();
+            UIEmpty head = new UIEmpty();
             head.setDisplayName(list.name());
             head.alignTextMiddle();
             head.setDimensions(0, 0, width, height * 0.6f);

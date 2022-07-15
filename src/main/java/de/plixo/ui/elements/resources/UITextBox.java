@@ -1,6 +1,7 @@
 package de.plixo.ui.elements.resources;
 
 import de.plixo.ui.elements.UIReference;
+import de.plixo.ui.general.ColorLib;
 import de.plixo.ui.resource.TextBox;
 
 public class UITextBox extends UIReference<String> {
@@ -10,6 +11,8 @@ public class UITextBox extends UIReference<String> {
     @Override
     public void init() {
         enableScissor();
+        setSelectionOutlineColor(ColorLib.getMainColor(0.4f));
+        setOutlineWidth(2f);
     }
 
     @Override

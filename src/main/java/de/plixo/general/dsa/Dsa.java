@@ -17,18 +17,18 @@ public class Dsa {
 
     public static Config compileToConfig(String path) {
         final Class<Config> targetClass = Config.class;
-        return new Toml().read(new File(path)).to(targetClass);
+        return new Toml().read(new File("content/shader/" + path)).to(targetClass);
     }
 
     public static Tuple<String, String> compileToSrc(String path) {
         final Class<Config> targetClass = Config.class;
-        final Config config = new Toml().read(new File(path)).to(targetClass);
+        final Config config = new Toml().read(new File("content/shader/" + path)).to(targetClass);
         return new Tuple<>(compile_vertex(config), compile_fragment(config));
     }
 
     public static Tuple<Config, Shader> compileToShader(String path) {
         final Class<Config> targetClass = Config.class;
-        final Config config = new Toml().read(new File(path)).to(targetClass);
+        final Config config = new Toml().read(new File("content/shader/" + path)).to(targetClass);
         final String vertex = compile_vertex(config);
         final String fragment = compile_fragment(config);
         final Shader shader = Shader.fromSource(vertex, fragment);

@@ -6,13 +6,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2d;
+import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class IO {
     @Getter
     @Setter
-    private static Vector2d mouse = new Vector2d();
+    private static Vector2f mouse = new Vector2f();
 
 
     public static boolean mouseDown(int key) {
@@ -26,6 +27,6 @@ public class IO {
 
     @SubscribeEvent
     static void mouse(@NotNull MouseMoveEvent event) {
-        mouse = new Vector2d(event.mouse());
+        mouse = new Vector2f((float) event.mouse().x, (float) event.mouse().y);
     }
 }

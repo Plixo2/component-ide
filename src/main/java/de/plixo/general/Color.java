@@ -5,6 +5,8 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.plixo.gsonplus.ExposeField;
 
+import static org.lwjgl.opengl.GL11.glColor4f;
+
 public class Color {
 
     public static float DARKER_FADE = 0.2f;
@@ -32,6 +34,14 @@ public class Color {
                 b;
     }
 
+
+    public void bindGl() {
+        float alpha = (float) (rgba >> 24 & 255) / 255.0f;
+        float red = (float) (rgba >> 16 & 255) / 255.0f;
+        float green = (float) (rgba >> 8 & 255) / 255.0f;
+        float blue = (float) (rgba & 255) / 255.0f;
+        glColor4f(red, green, blue, alpha);
+    }
 
 //    public Vector3f toVec3() {
 //        return new Vector3f(red()/255f,green()/255f,blue()/255f);
@@ -153,5 +163,14 @@ public class Color {
 
     public static int getBlue(int color) {
         return color & 0xff;
+    }
+
+    public void overwrite(int rgba) {
+        this.rgba = rgba;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(rgba);
     }
 }

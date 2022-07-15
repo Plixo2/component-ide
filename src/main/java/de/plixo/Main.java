@@ -1,14 +1,17 @@
 package de.plixo;
 
+import de.plixo.animation.Animation;
 import de.plixo.event.Dispatcher;
 import de.plixo.event.impl.*;
-import de.plixo.game.MeshRegistry;
+import de.plixo.rendering.Debug;
 import de.plixo.state.IO;
+import de.plixo.state.MeshRegistry;
 import de.plixo.state.Window;
 import de.plixo.state.World;
 import de.plixo.ui.impl.GLFWMouse;
 import de.plixo.ui.impl.OpenGlRenderer;
 import de.plixo.ui.impl.UI;
+import lombok.val;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -47,18 +50,22 @@ public class Main {
 
         long lastMS = System.currentTimeMillis();
         while (!glfwWindowShouldClose(Window.INSTANCE.id())) {
-            final long time = System.currentTimeMillis();
-            Dispatcher.emit(new RenderEvent((time - lastMS) / 1000f));
+            val time = System.currentTimeMillis();
+            final var delta_time = time - lastMS;
+            Dispatcher.emit(new RenderEvent(delta_time / 1000f));
             Dispatcher.emit(new PostRenderEvent());
-            lastMS = time;
 
-            long deltaMs = System.currentTimeMillis() - deltaTickMS;
+//            System.out.println("Took " + (delta_time) + " ms " + (1000.0 / delta_time) + " fps");
+
+            val deltaMs = System.currentTimeMillis() - deltaTickMS;
             if (deltaMs > 50) {
                 deltaTickMS = System.currentTimeMillis() - Math.min(50, (deltaMs - 50));
                 Dispatcher.emit(new TickEvent());
             }
-
+            lastMS = time;
         }
+        Dispatcher.emit(new ShutDownEvent());
+
     }
 
     public static void main(String[] args) {
@@ -72,6 +79,8 @@ public class Main {
         Dispatcher.registerStatic(OpenGlRenderer.class);
         Dispatcher.registerStatic(MeshRegistry.class);
         Dispatcher.registerStatic(UI.class);
+        Dispatcher.registerStatic(Debug.class);
+        Dispatcher.registerStatic(Animation.class);
 
 
         Window.INSTANCE = new Window();

@@ -22,8 +22,10 @@ public class UINumber extends UIReference<Float> {
     public void init() {
         enableScissor();
         setSelectionOutlineColor(ColorLib.getMainColor(0.4f));
+        setOutlineWidth(2f);
     }
 
+    float last = 0;
     @Override
     public void drawScreen(float mouseX, float mouseY) {
         defaults(mouseX, mouseY);
@@ -34,6 +36,13 @@ public class UINumber extends UIReference<Float> {
         box.drawScreen(isSelected());
         endScissor();
         GUI.popMatrix();
+
+        if(isDragged()) {
+            float delta = this.last - mouseX;
+            assert reference != null;
+            reference.setValue(reference.getValue() + delta * 0.1f);
+        }
+        this.last = mouseX;
     }
 
     @Override
@@ -56,6 +65,12 @@ public class UINumber extends UIReference<Float> {
     }
 
     @Override
+    public void mouseClicked(float mouseX, float mouseY, int mouseButton) {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+        this.setSelected(false);
+    }
+
+    @Override
     public void onTick() {
         if (!isSelected()) {
             internalRef.setValue(format.format(reference.getValue()));
@@ -65,7 +80,7 @@ public class UINumber extends UIReference<Float> {
 
 
     @Override
-    public void mouseClicked(float mouseX, float mouseY, int mouseButton) {
+    public void mouseReleased(float mouseX, float mouseY, int mouseButton) {
         final boolean notSelected = !isSelected();
         if (notSelected) {
             internalRef.setValue(format.format(reference.getValue()));
@@ -77,7 +92,8 @@ public class UINumber extends UIReference<Float> {
                 internalRef.setValue(format.format(reference.getValue()));
             }
         }
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+        super.mouseReleased(mouseX, mouseY, mouseButton);
+        this.setSelected(this.isHovered(mouseX, mouseY));
         if (isSelected() && notSelected) {
             box.setCursor1(1000);
             box.setCursorDelay(500);

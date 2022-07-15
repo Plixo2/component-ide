@@ -5,7 +5,7 @@ import de.plixo.general.Util;
 
 public class ColorLib {
 
-    public static Color mainColor = new Color(0xFF2B7EFF);
+    public static Color mainColor = new Color(0xFF2B7EFF); //s: 83, B: 100, H: 217
     public static Color mainColorFade = new Color(0xFFF142E0);
     public static Color backgroundColor = new Color(0xFF1F3140);
     public static Color backgroundFadeColor = new Color(0xFF101215);

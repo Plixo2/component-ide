@@ -8,6 +8,7 @@ public class Tuple<A, B> {
         this.first = first;
         this.second = second;
     }
+
     public Tuple() {
 
     }
@@ -15,5 +16,27 @@ public class Tuple<A, B> {
     @Override
     public String toString() {
         return "{" + first + ", " + second + "}";
+    }
+
+    public static class Triple<A, B, C> {
+        public A first;
+        public B second;
+        public C third;
+
+        public Triple(A first, B second, C third) {
+            this.first = first;
+            this.second = second;
+            this.third = third;
+        }
+
+        public Triple() {
+
+        }
+
+
+        @Override
+        public String toString() {
+            return "{" + first + ", " + second + ", " + third + "}";
+        }
     }
 }

@@ -1,0 +1,3 @@
+21?de.plixo.general.Color:-6946799
+22?java.lang.Float:10.0
+24?java.lang.Boolean:true

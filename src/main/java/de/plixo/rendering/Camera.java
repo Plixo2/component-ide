@@ -4,6 +4,7 @@ import de.plixo.event.SubscribeEvent;
 import de.plixo.event.impl.MouseMoveEvent;
 import de.plixo.event.impl.RenderEvent;
 import de.plixo.event.impl.ScrollEvent;
+import de.plixo.general.Util;
 import de.plixo.state.IO;
 import de.plixo.state.Window;
 import lombok.AllArgsConstructor;
@@ -33,9 +34,12 @@ public class Camera {
 
 
     public void rotate(double yaw, double pitch) {
+
+        this.pitch = Util.clampDouble((this.pitch + pitch),89.9f,-89.9f);
+//        this.yaw = Util.clampDouble((this.yaw + yaw),90,0);
         this.yaw += yaw;
-        this.pitch += pitch;
     }
+
 
     public Matrix4f view() {
         final Matrix4f view = new Matrix4f();
@@ -53,12 +57,16 @@ public class Camera {
 
     public Matrix4f orthographic() {
         final Matrix4f projection = new Matrix4f();
-        projection.ortho(-1, 1, -1, 1, 0.001f, 1000f, true);
+        float aspect = Window.INSTANCE.width() / (float) Window.INSTANCE.height();
+        float size = distance/2.0f;
+        projection.ortho(-size * aspect, size  * aspect, -size, size, 0.001f, 1000f, true);
         return projection;
     }
 
 
     public Vector3f position() {
+        final var yaw = Math.toRadians(this.yaw);
+        final var pitch = Math.toRadians(this.pitch);
         final double x = Math.cos(yaw) * Math.cos(pitch);
         final double z = Math.sin(yaw) * Math.cos(pitch);
         final double y = Math.sin(pitch);
@@ -67,6 +75,8 @@ public class Camera {
     }
 
     public Vector3f forward() {
+        final var yaw = Math.toRadians(this.yaw);
+        final var pitch = Math.toRadians(this.pitch);
         final double x = Math.cos(yaw) * Math.cos(pitch);
         final double z = Math.sin(yaw) * Math.cos(pitch);
         final double y = Math.sin(pitch);
@@ -76,19 +86,14 @@ public class Camera {
 
     @SubscribeEvent
     void rotate(@NotNull MouseMoveEvent event) {
-        float speed = 0.007f;
+        float speed = 0.25f;
         if (IO.mouseDown(1))
             rotate(event.delta().x * speed, -event.delta().y * speed);
     }
 
     @SubscribeEvent
     void scroll(@NotNull ScrollEvent event) {
-        distance -= event.delta().y * 0.3f;
-    }
-
-    @SubscribeEvent
-    void tick(@NotNull RenderEvent event) {
-//        rotate(10 * event.delta(),0);
+        distance =  Util.clampFloat((float) (distance -  event.delta().y * 1.7f), 30,2);
     }
 
 }

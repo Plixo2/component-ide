@@ -3,14 +3,10 @@ package de.plixo.state;
 import de.plixo.event.Dispatcher;
 import de.plixo.event.SubscribeEvent;
 import de.plixo.event.impl.*;
-import de.plixo.game.AtlasGen;
-import de.plixo.game.BlockMesh;
-import de.plixo.game.MeshRegistry;
-import de.plixo.game.impl.Simple;
 import de.plixo.general.Tuple;
-import de.plixo.general.dsa.Dsa;
 import de.plixo.general.reference.ExposedReference;
-import de.plixo.rendering.*;
+import de.plixo.rendering.Camera;
+import de.plixo.rendering.Debug;
 import de.plixo.ui.elements.UIElement;
 import de.plixo.ui.elements.layout.UICanvas;
 import de.plixo.ui.general.FontRenderer;
@@ -19,6 +15,7 @@ import de.plixo.ui.general.MainWindow;
 import de.plixo.ui.impl.GLFWKeyboard;
 import de.plixo.ui.impl.GLFWMouse;
 import de.plixo.ui.impl.OpenGlRenderer;
+import de.plixo.ui.impl.UI;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -61,15 +58,19 @@ public class Window {
 
     @Getter
     @Accessors(fluent = true)
+    float delta_time;
+
+    @Getter
+    @Accessors(fluent = true)
     private Matrix4f projview = new Matrix4f();
 
-
+    public static float UI_SCALE = 2f;
 
     @SubscribeEvent
     void init(@NotNull InitEvent event) {
         id = initGlfw();
 
-        camera = new Camera(0, 0, 6, false, new Vector3f(5.5f,5.5f,5.5f), 70);
+        camera = new Camera(0, 0, 6, false, new Vector3f(5f, 5f, 5f), 70);
         Dispatcher.register(camera);
     }
 
@@ -78,32 +79,12 @@ public class Window {
         final FontRenderer verdana = new FontRenderer(new Font("Verdana", Font.BOLD, 18));
         OpenGlRenderer.setFontRenderer(verdana);
         new LodestoneUI(new OpenGlRenderer(), new GLFWKeyboard(), new GLFWMouse());
-
-//        val config = Dsa.compileToShader("content/shader/test.toml");
-//        shader = config.second;
-//        projection = shader.uniform("projection");
-//        view = shader.uniform("view");
-//        model = shader.uniform("model");
-//
-//        float vertices[] = {
-//                0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-//                0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-//                -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-//                -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
-//        };
-//        int indices[] = {  // note that we start from 0!
-//                0, 1, 3,  // first Triangle
-//                1, 2, 3   // second Triangle
-//        };
-
-//        mesh = Mesh.from_raw(vertices, indices,
-//                new Shader.Attribute[]{Shader.Attribute.Vec3, Shader.Attribute.Vec3, Shader.Attribute.Vec2});
-
         Dispatcher.emit(new ResizeEvent(new Vector2i(width, height)));
     }
 
     @SubscribeEvent
     void renderEvent(@NotNull RenderEvent event) {
+        delta_time = event.delta();
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
@@ -121,24 +102,18 @@ public class Window {
             glLoadMatrixf(viewMatrix.get(stack.mallocFloat(16)));
         }
 
-
-
         projectionMatrix.mul(viewMatrix, projview);
 
         Debug.gizmo();
 
+
         Dispatcher.emit(new Render3DEvent(event.delta()));
-
-        val dir_ = screenToWorld((float) IO.getMouse().x, (float) IO.getMouse().y);
-        val origin = dir_.first;
-        val dir = dir_.second;
-        val forward = origin.add(dir.mul(10f));
-        glPushMatrix();
-        glTranslatef(forward.x, forward.y, forward.z);
-        Debug.cube(0.1f);
-
-        glPopMatrix();
-
+        boolean bln = UI.reflectBool(24,"vsync",true);
+        if(bln) {
+            glfwSwapInterval(1);
+        } else {
+            glfwSwapInterval(0);
+        }
 
         glDisable(GL_DEPTH_TEST);
         glMatrixMode(GL_PROJECTION);
@@ -171,8 +146,8 @@ public class Window {
         glPopMatrix();
 
         UIElement.GUI.pushMatrix();
-        UIElement.GUI.scale(2, 2);
-        uiWindow.drawScreen((float) IO.getMouse().x / 2f, (float) IO.getMouse().y / 2f);
+        UIElement.GUI.scale(UI_SCALE, UI_SCALE);
+        uiWindow.drawScreen(IO.getMouse().x / UI_SCALE, IO.getMouse().y / UI_SCALE);
         UIElement.GUI.popMatrix();
 
 
@@ -180,19 +155,10 @@ public class Window {
         glfwPollEvents();
     }
 
-    void ui() {
-        final MainWindow.Window win = MainWindow.displayWindow("Main");
-        final UICanvas canvas = win.getCanvas();
-        canvas.setColor(0);
-        Dispatcher.emit(new UIInitEvent(canvas));
-//        0xFF0D0D0D
-    }
 
     public Vector2f worldToScreen(Vector3f position) {
         val vec4 = new Vector4f(position, 1.0f);
-        final Matrix4f projectionMatrix = camera.projection();
-        final Matrix4f viewMatrix = camera.view();
-        final Vector4f mul = vec4.mul(projectionMatrix.mul(viewMatrix));
+        final Vector4f mul = vec4.mul(projview);
 
         val x = mul.x / mul.w;
         var y = mul.y / mul.w;
@@ -205,9 +171,7 @@ public class Window {
     public Tuple<Vector3f, Vector3f> screenToWorld(float x, float y) {
         val xNDC = (2 * (x / width) - 1f);
         val yNDC = (-2 * (y / height) + 1f);
-        val projectionMatrix = camera.projection();
-        val viewMatrix = camera.view();
-        val camera_inverse_matrix = (projectionMatrix.mul(viewMatrix)).invert();
+        val camera_inverse_matrix = (new Matrix4f(projview)).invert();
         val near = (new Vector4f(xNDC, yNDC, 0, 1)).mul(camera_inverse_matrix);
         val far = (new Vector4f(xNDC, yNDC, 1, 1)).mul(camera_inverse_matrix);
 
@@ -222,9 +186,6 @@ public class Window {
     @SubscribeEvent
     void tick(@NotNull TickEvent event) {
         uiWindow.onTick();
-
-
-//        System.out.println(vector3f);
     }
 
     @SubscribeEvent
@@ -232,8 +193,11 @@ public class Window {
         width = event.size().x;
         height = event.size().y;
 
-        uiWindow = new MainWindow(width / 2, height / 2);
-        ui();
+        uiWindow = new MainWindow((int) (width / UI_SCALE), (int) (height / UI_SCALE));
+        final MainWindow.Window win = MainWindow.displayWindow("Main");
+        final UICanvas canvas = win.getCanvas();
+        canvas.setColor(0);
+        Dispatcher.emit(new UIInitEvent(canvas));
     }
 
     private long initGlfw() {
@@ -304,19 +268,18 @@ public class Window {
         }
 
         glfwMakeContextCurrent(window);
-        glfwSwapInterval(1);
         glfwShowWindow(window);
         return window;
     }
 
     @SubscribeEvent
     void onClick(@NotNull MouseClickEvent event) {
-        uiWindow.mouseClicked(event.mouseX() / 2f, event.mouseY() / 2f, event.button());
+        uiWindow.mouseClicked(event.mouseX() / UI_SCALE, event.mouseY() / UI_SCALE, event.button());
     }
 
     @SubscribeEvent
     void onRelease(@NotNull MouseReleaseEvent event) {
-        uiWindow.mouseReleased(event.mouseX() / 2f, event.mouseY() / 2f, event.button());
+        uiWindow.mouseReleased(event.mouseX() / UI_SCALE, event.mouseY() / UI_SCALE, event.button());
     }
 
     @SubscribeEvent

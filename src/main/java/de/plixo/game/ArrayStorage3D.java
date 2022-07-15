@@ -33,5 +33,10 @@ public class ArrayStorage3D<T> implements Storage3D<T> {
         storage[x][y][z] = obj;
     }
 
+    @Override
+    public int size() {
+        return size;
+    }
+
 
 }
