@@ -1,8 +1,8 @@
 package de.plixo.game;
 
 import de.plixo.rendering.Mesh;
-import de.plixo.rendering.Shader;
-import de.plixo.rendering.Texture;
+import de.plixo.rendering.targets.Shader;
+import de.plixo.rendering.targets.Texture;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Accessors;

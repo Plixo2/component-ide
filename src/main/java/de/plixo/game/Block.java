@@ -1,29 +1,18 @@
 package de.plixo.game;
 
-import de.plixo.general.collision.AABB;
-import de.plixo.general.collision.CollisionMesh;
+import de.plixo.game.collision.AABB;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3i;
 
+@Getter
+@Accessors(fluent = true)
 public class Block {
 
-
-    @Getter
-    @Accessors(fluent = true)
     private int x = -1;
-
-    @Getter
-    @Accessors(fluent = true)
     private int y = -1;
-
-    @Getter
-    @Accessors(fluent = true)
     private int z = -1;
-
-
-    @Getter
-    @Accessors(fluent = true)
     @NotNull AABB aabb = new AABB(0, 0, 0, 0, 0, 0);
 
     public void setPosition(int x, int y, int z) {
@@ -35,5 +24,10 @@ public class Block {
         this.z = z;
         this.aabb = new AABB(x, y, z, x + 1, y + 1, z + 1);
     }
+
+    public Vector3i veci() {
+        return new Vector3i(x, y, z);
+    }
+
 
 }

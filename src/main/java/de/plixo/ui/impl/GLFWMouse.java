@@ -4,7 +4,7 @@ package de.plixo.ui.impl;
 import de.plixo.event.SubscribeEvent;
 import de.plixo.event.impl.PostRenderEvent;
 import de.plixo.event.impl.ScrollEvent;
-import de.plixo.ui.interfaces.IMouse;
+import de.plixo.ui.lib.interfaces.IMouse;
 import org.jetbrains.annotations.NotNull;
 
 public class GLFWMouse implements IMouse {

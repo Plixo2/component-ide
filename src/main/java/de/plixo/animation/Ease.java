@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 import java.util.function.Function;
 
 /**
- * https://easings.net
+ * <a href="https://easings.net">...</a>
  */
 public enum Ease {
     InOutSine(x -> -(Math.cos(Math.PI * x) - 1) / 2),
@@ -50,6 +50,7 @@ public enum Ease {
 
     @Getter
     @Accessors(fluent = true)
+    final
     Function<Double, Double> function;
 
     Ease(Function<Double, Double> function) {

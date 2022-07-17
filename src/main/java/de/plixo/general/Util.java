@@ -3,6 +3,8 @@ package de.plixo.general;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -58,6 +60,37 @@ public class Util {
         return angle;
     }
 
+
+
+    public static int[] toIntArray(IntBuffer b) {
+        if (b.hasArray()) {
+            if (b.arrayOffset() == 0)
+                return b.array();
+
+            return Arrays.copyOfRange(b.array(), b.arrayOffset(), b.array().length);
+        }
+
+        b.rewind();
+        int[] foo = new int[b.remaining()];
+        b.get(foo);
+
+        return foo;
+    }
+
+    public static float[] toFloatArray(FloatBuffer b) {
+        if (b.hasArray()) {
+            if (b.arrayOffset() == 0)
+                return b.array();
+
+            return Arrays.copyOfRange(b.array(), b.arrayOffset(), b.array().length);
+        }
+
+        b.rewind();
+        float[] foo = new float[b.remaining()];
+        b.get(foo);
+
+        return foo;
+    }
 
 
 }

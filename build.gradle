@@ -16,23 +16,27 @@ repositories {
 
 
 dependencies {
+    //apache
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
 
+
+    //loading / saving
     implementation "de.javagl:obj:0.3.0"
-
-
     implementation files("libs/toml4j-0.7.3-plixo.jar")
     implementation files("libs/gson-plus1.7.1.jar")
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.7'
 
+    //lombok
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
+    //annotations
     compileOnly 'org.jetbrains:annotations:23.0.0'
 
-    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
+    //lwjgl
+    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
     implementation "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"
     implementation "org.lwjgl:lwjgl-bgfx"

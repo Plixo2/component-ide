@@ -14,11 +14,11 @@ public interface Storage3D<T> {
 
     @Nullable T get(int x, int y, int z);
 
-    default void insert(@Nullable T obj, @NotNull Vector3i position) {
-        insert(obj, position.x, position.y, position.z);
+    default boolean insert(@Nullable T obj, @NotNull Vector3i position) {
+        return insert(obj, position.x, position.y, position.z);
     }
 
-    void insert(@Nullable T obj, int x, int y, int z);
+    boolean insert(@Nullable T obj, int x, int y, int z);
 
     int size();
 

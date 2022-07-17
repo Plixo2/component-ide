@@ -14,7 +14,10 @@ tex0 = "sampler2D"
 [fragment]
 output = { out_color = "vec4" }
 source = '''
-        out_color = texture(tex0,tex);
+    out_color = texture(tex0,tex);
+    if(out_color.w == 0) {
+        discard;
+    }
 '''
 
 [vertex]

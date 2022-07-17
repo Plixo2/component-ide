@@ -7,19 +7,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
-//@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 public class Dispatcher {
-    static HashMap<Class<?>, LinkedList<EventReceiver>> receiver = new HashMap<>();
+    static Map<Class<?>, List<EventReceiver>> receiver = new HashMap<>();
 
     record EventReceiver(@Nullable Object object, @NotNull Method method) {
     }
 
 
     public static void emit(@NotNull Event event) {
-        final LinkedList<EventReceiver> receivers = receiver.get(event.getClass());
+        final List<EventReceiver> receivers = receiver.get(event.getClass());
         if (receivers != null) {
             receivers.forEach(ref -> {
                 try {
@@ -44,8 +42,8 @@ public class Dispatcher {
             if (Event.class.isAssignableFrom(input)) {
                 method.setAccessible(true);
 
-                final LinkedList<EventReceiver> list =
-                        receiver.computeIfAbsent(input, u -> new LinkedList<>());
+                final List<EventReceiver> list =
+                        receiver.computeIfAbsent(input, u -> new ArrayList<>());
                 list.add(new EventReceiver(object, method));
             }
         }
@@ -63,8 +61,8 @@ public class Dispatcher {
 
             if (Event.class.isAssignableFrom(input)) {
                 method.setAccessible(true);
-                final LinkedList<EventReceiver> list =
-                        receiver.computeIfAbsent(input, u -> new LinkedList<>());
+                final List<EventReceiver> list =
+                        receiver.computeIfAbsent(input, u -> new ArrayList<>());
                 list.add(new EventReceiver(null, method));
             }
         }

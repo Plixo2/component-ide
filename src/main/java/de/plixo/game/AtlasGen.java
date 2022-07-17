@@ -1,10 +1,8 @@
 package de.plixo.game;
 
 import de.plixo.general.Tuple;
-import de.plixo.rendering.Texture;
-import lombok.Getter;
+import de.plixo.rendering.targets.Texture;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
@@ -19,6 +17,7 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AtlasGen {
+
     public static @NotNull Tuple<HashMap<BufferedImage, Vector2i>, BufferedImage> generate(Collection<BufferedImage> textures, int dim) {
         BufferedImage img = new BufferedImage(dim, dim, BufferedImage.TYPE_INT_ARGB);
         final var graphics = img.getGraphics();
@@ -36,14 +35,14 @@ public class AtlasGen {
                 last.set(0);
             }
 
-            graphics.drawImage(texture, x.get()+2, y.get()+1, texture.getWidth(), texture.getHeight(), null);
-            graphics.drawImage(texture, x.get(), y.get()+1, texture.getWidth(), texture.getHeight(), null);
-            graphics.drawImage(texture, x.get()+1, y.get()+2, texture.getWidth(), texture.getHeight(), null);
-            graphics.drawImage(texture, x.get()+1, y.get(), texture.getWidth(), texture.getHeight(), null);
+            graphics.drawImage(texture, x.get() + 2, y.get() + 1, texture.getWidth(), texture.getHeight(), null);
+            graphics.drawImage(texture, x.get(), y.get() + 1, texture.getWidth(), texture.getHeight(), null);
+            graphics.drawImage(texture, x.get() + 1, y.get() + 2, texture.getWidth(), texture.getHeight(), null);
+            graphics.drawImage(texture, x.get() + 1, y.get(), texture.getWidth(), texture.getHeight(), null);
 
-            graphics.drawImage(texture, x.get()+1, y.get()+1, texture.getWidth(), texture.getHeight(), null);
+            graphics.drawImage(texture, x.get() + 1, y.get() + 1, texture.getWidth(), texture.getHeight(), null);
 
-            map.put(texture, new Vector2i(x.get()+1, y.get()+1));
+            map.put(texture, new Vector2i(x.get() + 1, y.get() + 1));
             y.addAndGet(texture.getHeight() + 2);
             last.set(Math.max(last.get(), texture.getWidth() + 2));
             if (x.get() + texture.getWidth() + 2 > img.getWidth()) {
@@ -54,55 +53,8 @@ public class AtlasGen {
         return new Tuple<>(map, img);
     }
 
-    public static void main(String[] args) {
-        File f = new File("content/packtest");
-        val images = new ArrayList<BufferedImage>();
-        for (File file : f.listFiles()) {
-            try {
-                images.add(ImageIO.read(file));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        final var generate = generate(images, 64);
-        try {
-                final var graphics = generate.second.getGraphics();
-            generate.first.forEach((img, coord) -> {
-                graphics.drawRect(coord.x,coord.y,img.getWidth(),img.getHeight());
-            });
 
-            ImageIO.write(generate.second, "png", new File("content/packed.png"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    @RequiredArgsConstructor
-    public static class AtlasEntry {
-        @Getter
-        @Accessors(fluent = true)
-        final Texture atlas;
-
-        @Getter
-        @Accessors(fluent = true)
-        final float x;
-
-        @Getter
-        @Accessors(fluent = true)
-        final float y;
-
-
-        @Getter
-        @Accessors(fluent = true)
-        final float width;
-
-
-        @Getter
-        @Accessors(fluent = true)
-        final float height;
-
-
+    public record AtlasEntry(@NotNull Texture atlas, float x, float y, float width, float height) {
         @Override
         public String toString() {
             return "AtlasEntry{" +
@@ -114,4 +66,29 @@ public class AtlasGen {
                     '}';
         }
     }
+
+//    public static void main(String[] args) {
+//        File f = new File("content/packtest");
+//        val images = new ArrayList<BufferedImage>();
+//        for (File file : f.listFiles()) {
+//            try {
+//                images.add(ImageIO.read(file));
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//        final var generate = generate(images, 64);
+//        try {
+//            final var graphics = generate.second.getGraphics();
+//            generate.first.forEach((img, coord) -> {
+//                graphics.drawRect(coord.x, coord.y, img.getWidth(), img.getHeight());
+//            });
+//
+//            ImageIO.write(generate.second, "png", new File("content/packed.png"));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//    }
+//
 }

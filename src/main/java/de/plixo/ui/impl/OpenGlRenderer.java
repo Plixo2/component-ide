@@ -1,10 +1,9 @@
 package de.plixo.ui.impl;
 
 import de.plixo.event.SubscribeEvent;
-import de.plixo.event.impl.RenderEvent;
-import de.plixo.ui.general.FontRenderer;
-import de.plixo.ui.general.MainWindow;
-import de.plixo.ui.interfaces.IRenderer;
+import de.plixo.event.impl.Render3DEvent;
+import de.plixo.ui.lib.general.UIManager;
+import de.plixo.ui.lib.interfaces.IRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
 import org.lwjgl.opengl.GL11;
@@ -12,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 import java.nio.FloatBuffer;
 import java.util.Stack;
 
-import static de.plixo.state.Window.UI_SCALE;
+import static de.plixo.systems.RenderSystem.UI_SCALE;
 import static org.lwjgl.opengl.GL11.*;
 
 
@@ -311,7 +310,6 @@ public class OpenGlRenderer implements IRenderer {
     }
 
     public static void reset() {
-        // glDisable(GL_BLEND);
         glEnable(GL_TEXTURE_2D);
         glColor4f(1, 1, 1, 1);
     }
@@ -374,25 +372,8 @@ public class OpenGlRenderer implements IRenderer {
             return;
         }
 
-//        final var realH = MainWindow.INSTANCE.getHeight();
-//        float bottomY = realH - (y2 * UI_SCALE);
 
-//
-//        float realX = x * UI_SCALE;
-//        float realY = y * UI_SCALE;
-//        float realX2 = x2 * UI_SCALE;
-//        float realY2 = y2 * UI_SCALE;
-//
-//        float realW = realX2 - realX;
-//        float realH = realY2 - realY;
-//
-//        GL11.glPushMatrix();
-//        glMatrixMode(GL_MODELVIEW);
-//        glLoadIdentity();
-//        drawLinedRect(x,y,x2,y2,-1,1);
-//        GL11.glPopMatrix();
-
-        float bottomY = (MainWindow.INSTANCE.getHeight() * UI_SCALE) - y2;
+        float bottomY = (UIManager.INSTANCE.getHeight() * UI_SCALE) - y2;
         glScissor(Math.round(x),
                 Math.round(bottomY),
                 Math.round(wDiff),
@@ -486,22 +467,17 @@ public class OpenGlRenderer implements IRenderer {
     }
 
     @SubscribeEvent
-    static void renderEvent(@NotNull RenderEvent event) {
+    static void renderEvent(@NotNull Render3DEvent event) {
         delta = (long) (event.delta() * 1000);
     }
 
-    static Stack<FloatBuffer> matrices = new Stack<>();
 
     public static void push() {
         glPushMatrix();
-//        FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(16);
-//        glGetFloatv(GL_MODELVIEW_MATRIX, floatBuffer);
-//        matrices.add(floatBuffer);
     }
 
     public static void pop() {
         glPopMatrix();
-//        glLoadMatrixf(Objects.requireNonNull(matrices.pop()));
     }
 
 }

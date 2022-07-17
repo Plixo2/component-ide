@@ -1,8 +1,8 @@
 package de.plixo.ui.impl;
 
 
-import de.plixo.state.IO;
-import de.plixo.ui.interfaces.IKeyboard;
+import de.plixo.general.IO;
+import de.plixo.ui.lib.interfaces.IKeyboard;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;

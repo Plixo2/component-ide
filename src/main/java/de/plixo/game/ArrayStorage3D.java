@@ -23,14 +23,17 @@ public class ArrayStorage3D<T> implements Storage3D<T> {
 
     public @Nullable T get(int x, int y, int z) {
         if (x < 0 || x >= size || y < 0 || y >= size || z < 0 || z >= size) {
-            //TODO throw?
             return null;
         }
         return (T) storage[x][y][z];
     }
 
-    public void insert(@Nullable T obj,int x, int y, int z) {
+    public boolean insert(@Nullable T obj,int x, int y, int z) {
+        if (x < 0 || x >= size || y < 0 || y >= size || z < 0 || z >= size) {
+            return false;
+        }
         storage[x][y][z] = obj;
+        return true;
     }
 
     @Override

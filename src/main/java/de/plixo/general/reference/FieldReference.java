@@ -1,25 +1,33 @@
 package de.plixo.general.reference;
 
+import lombok.Getter;
+import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Field;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class FieldReference<O> extends InterfaceReference<O> {
-    String name;
-    Field field;
+    @Getter
+    @Accessors(fluent = true)
+    @NotNull
+    final Field field;
 
-    public FieldReference(String name , Field field, Consumer<O> setter, Supplier<O> getter) {
-        super(setter, getter);
-        this.name = name;
+    public FieldReference(@NotNull Field field, final @NotNull Object object) {
+        super(s -> {
+            try {
+                field.set(object, s);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }, () -> {
+            try {
+                return (O) field.get(object);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        field.setAccessible(true);
         this.field = field;
     }
 
-
-    public String getName() {
-        return name;
-    }
-
-    public Field getField() {
-        return field;
-    }
 }
