@@ -41,7 +41,7 @@ public class TextBox {
     private int selectionWidth = 0;
 
     private int textColor = ColorLib.getTextColor();
-    private int selectedText = Color.BLACK.getRgba();
+    private int selectedText = Color.BLACK.rgba();
     private int selectionColor = ColorLib.getMainColor(0.4f);
 
     @Setter
@@ -75,7 +75,7 @@ public class TextBox {
             final float cursorMax = renderer.getStringWidth(middle);
 
             float p = Math.abs(selectionWidth) / (float) internalString.length();
-            renderer.drawRoundedRect(x + cursorMin, y, x + cursorMax, y + height, 3,
+            renderer.drawRoundedRect(x + cursorMin, y, x + cursorMax, y + height, 1.5f,
                     ColorLib.getMainColor(Util.clamp01(p)));
 
             renderer.drawString(prefix, x, y + height / 2, textColor);
@@ -90,7 +90,7 @@ public class TextBox {
         } else {
             if (cursorDelay > 0) {
                 renderer.drawRect(x + cursorPosition - 0.5f, y, x + cursorPosition + 0.5f, y + height,
-                        Color.WHITE.getRgba());
+                        Color.WHITE.rgba());
             } else if (cursorDelay < -500) {
                 cursorDelay = 500;
             }
@@ -172,9 +172,14 @@ public class TextBox {
             }
             if (key == keyboard.KEY_LEFT()) {
                 cursor1 += skip(selectionWidth - 1, -1);
+                selection = false;
+                selectionWidth = 0;
             } else if (key == keyboard.KEY_RIGHT()) {
                 cursor1 += skip(selectionWidth, 1);
+                selection = false;
+                selectionWidth = 0;
             }
+
         } else {
             if (key == keyboard.KEY_LEFT()) {
                 if (selection) {

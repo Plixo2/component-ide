@@ -77,10 +77,10 @@ public class Framebuffer extends Sealable implements RenderAsset {
     }
 
     public static void clear(Color color) {
-        float alpha = (float) (color.getRgba() >> 24 & 255) / 255.0f;
-        float red = (float) (color.getRgba() >> 16 & 255) / 255.0f;
-        float green = (float) (color.getRgba() >> 8 & 255) / 255.0f;
-        float blue = (float) (color.getRgba() & 255) / 255.0f;
+        float alpha = (float) (color.rgba() >> 24 & 255) / 255.0f;
+        float red = (float) (color.rgba() >> 16 & 255) / 255.0f;
+        float green = (float) (color.rgba() >> 8 & 255) / 255.0f;
+        float blue = (float) (color.rgba() & 255) / 255.0f;
         glClearColor(red, green, blue, alpha);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }

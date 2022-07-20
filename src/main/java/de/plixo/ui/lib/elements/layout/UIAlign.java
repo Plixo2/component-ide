@@ -118,9 +118,9 @@ public class UIAlign extends UICanvas {
             this.width = Math.max(element.x + element.width, this.width);
             this.height = Math.max(element.y + element.height, this.height);
         }
-        if (direction == VERTICAL) {
-            this.height = Math.min(this.height, pre);
-        } else this.width = Math.min(this.width, pre2);
+//        if (direction == VERTICAL) {
+//            this.height = Math.min(this.height, pre);
+//        } else this.width = Math.min(this.width, pre2);
     }
 
     public void sort() {

@@ -6,10 +6,9 @@ import de.plixo.event.impl.Render3DEvent;
 import de.plixo.game.ArrayStorage3D;
 import de.plixo.game.Block;
 import de.plixo.game.Storage3D;
-import de.plixo.game.blocks.Wool;
 import de.plixo.rendering.Mesh;
 import de.plixo.rendering.MeshBundle;
-import de.plixo.rendering.blockrendering.BlockRenderer;
+import de.plixo.rendering.BlockRenderer;
 import de.plixo.rendering.targets.Shader;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -45,7 +44,7 @@ public class WorldSystem implements Storage3D<Block> {
     void init(@NotNull PostInitEvent event) throws IOException {
         this.size = 10;
         renderStorage = new ArrayStorage3D<>(size);
-        val inverseCube = MeshBundle.generate("background.obj", "background.mtl", "obj.toml", Mesh.GENERATE_COLLISION);
+        val inverseCube = MeshBundle.generate("background.obj", "background.mtl", "background_cube.toml", Mesh.GENERATE_COLLISION);
         cubeMesh = inverseCube.first;
         cubeShader = inverseCube.second;
 

@@ -104,7 +104,7 @@ public class UINumber extends UIReference<Float> {
     public void setDimensions(float x, float y, float width, float height) {
         assert reference != null;
         float insert = 5;
-        float textHeight = 16;
+        float textHeight = Math.min(16,height-4);
         internalRef.setValue(format.format(reference.getValue()));
         box = new TextBox(internalRef, GUI, KEYBOARD, insert, height / 2 - textHeight / 2, width - insert * 2,
                 textHeight);

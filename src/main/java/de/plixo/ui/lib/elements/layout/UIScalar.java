@@ -1,5 +1,6 @@
 package de.plixo.ui.lib.elements.layout;
 
+import de.plixo.ui.lib.elements.UIElement;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,4 +41,14 @@ public class UIScalar extends UICanvas {
         return height / scale;
     }
 
+
+    @Override
+    public void pack() {
+        this.width = 0;
+        this.height = 0;
+        for (UIElement element : elements) {
+            this.width = Math.max(element.x + element.width, this.width) * scale;
+            this.height = Math.max(element.y + element.height, this.height) * scale;
+        }
+    }
 }

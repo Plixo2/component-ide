@@ -40,12 +40,12 @@ public class ColorLib {
     }
 
     public static int getBackground(float fraction) {
-        return backgroundColor.mix(backgroundFadeColor, 1-fraction).getRgba();
+        return backgroundColor.mix(backgroundFadeColor, 1-fraction).rgba();
     }
 
 
     public static int getMainColor(double fraction) {
-        return mainColor.mix(mainColorFade, (float) fraction).getRgba();
+        return mainColor.mix(mainColorFade, (float) fraction).rgba();
     }
 
 

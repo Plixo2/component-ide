@@ -9,6 +9,7 @@ import de.plixo.ui.impl.OpenGlRenderer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.RoundingMode;
@@ -64,7 +65,7 @@ public class UIFillBar extends UIReference<Float> {
         float rel = Util.clampFloat((mouseX - upperBound) / (lowerBound - upperBound), 1, 0);
         final float value = reference.getValue();
         if (isDragged() && isDraggable) {
-            final var val = min + rel * (max - min);
+            val val = min + rel * (max - min);
             reference.setValue(val);
         }
         float percent = Util.clampFloat((value - min) / (max - min), 1, 0);
@@ -75,9 +76,9 @@ public class UIFillBar extends UIReference<Float> {
         GUI.drawRoundedRect(upperBound - 2, y + verticalSpace - 2, lowerBound + 2,
                 y + height - verticalSpace + 2, 50, color);
         if (fade) {
-            int color2 = primaryColor.mix(fadeColor, Util.clamp01(percent + getHoverProgress() / 200f)).getRgba();
+            int color2 = primaryColor.mix(fadeColor, Util.clamp01(percent + getHoverProgress() / 200f)).rgba();
             final int leftCol = color2;
-            final int rightCol = primaryColor.getRgba();
+            final int rightCol = primaryColor.rgba();
             OpenGlRenderer.set(-1);
             glBegin(GL_QUADS);
 
@@ -113,7 +114,7 @@ public class UIFillBar extends UIReference<Float> {
             var top = y + verticalSpace;
             var right = upperBound + diff * percent;
             var bottom = y + height - verticalSpace;
-            GUI.drawRoundedRect(left, top, right, bottom, 50, primaryColor.getRgba());
+            GUI.drawRoundedRect(left, top, right, bottom, 50, primaryColor.mix(fadeColor,percent).rgba());
         }
 
 
@@ -124,7 +125,7 @@ public class UIFillBar extends UIReference<Float> {
             if (max == 100 && min == 0) {
                 text = Math.round(value) + "%";
             }
-            float min = upperBound + 5;
+            float min = upperBound + 3;
             GUI.drawString(text, min, y + height / 2, ColorLib.getTextColor());
         }
     }

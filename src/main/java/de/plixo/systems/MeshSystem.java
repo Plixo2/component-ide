@@ -3,23 +3,26 @@ package de.plixo.systems;
 import de.plixo.event.SubscribeEvent;
 import de.plixo.event.impl.PostInitEvent;
 import de.plixo.game.AtlasGen;
+import de.plixo.impl.block.Chest;
+import de.plixo.impl.render.InventoryBlockRenderer;
 import de.plixo.rendering.MeshBundle;
-import de.plixo.game.blocks.Wool;
-import de.plixo.general.Tuple;
+import de.plixo.impl.block.Wool;
 import de.plixo.rendering.targets.Texture;
-import de.plixo.rendering.blockrendering.BlockRenderer;
-import de.plixo.rendering.blockrendering.blocks.SimpleRenderer;
+import de.plixo.rendering.BlockRenderer;
+import de.plixo.impl.render.SimpleRenderer;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector2i;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class MeshSystem {
     @Getter
@@ -30,16 +33,36 @@ public class MeshSystem {
     @Accessors(fluent = true)
     private static final HashMap<Class<?>, BlockRenderer<?>> registeredRenderers = new HashMap<>();
 
-    private static final ArrayList<BufferedImage> atlasTextures = new ArrayList<>();
 
-    private static Tuple<HashMap<BufferedImage, Vector2i>, Texture> atlasEntries;
 
+//    private static final ArrayList<BufferedImage> atlasTextures = new ArrayList<>();
+//
+//    private static Tuple<HashMap<BufferedImage, Vector2i>, Texture> atlasEntries;
+
+
+    private static Texture itemTexture;
 
     @SubscribeEvent
     public static void register(@NotNull PostInitEvent event) throws IOException {
-        final var value = MeshBundle.generate("pipe.obj", "pipe.mtl", "obj.toml", 0);
-        registeredMeshes.put(Wool.class, value.first);
-        registeredRenderers.put(Wool.class, new SimpleRenderer(value.second));
+        val pipe = MeshBundle.generate("pipe.obj", "pipe.mtl", "light_obj.toml", 0);
+        registeredMeshes.put(Wool.class, pipe.first);
+        registeredRenderers.put(Wool.class, new SimpleRenderer(pipe.second));
+        val chest = MeshBundle.generate("container.obj", "container.mtl", "light_obj.toml", 0);
+        registeredMeshes.put(Chest.class, chest.first);
+        registeredRenderers.put(Chest.class, new InventoryBlockRenderer());
+
+
+        final var file = new File("content/textures/items");
+        final var files = file.listFiles();
+        assert files != null;
+        List<BufferedImage> images = new ArrayList<>();
+        for (File item : files) {
+            final var read = ImageIO.read(item);
+            images.add(read);
+        }
+        final var generated = AtlasGen.generate(images, 128,false);
+        ImageIO.write(generated.second,"png",new File("content/item-atlas.png"));
+
     }
 
     private static float[] injectUVs(float @NotNull [] uvs, int base, int offset,

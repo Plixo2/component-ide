@@ -1,6 +1,8 @@
 package de.plixo.general;
 
 
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.plixo.gsonplus.ExposeField;
 
 import static org.lwjgl.opengl.GL11.glColor4f;
@@ -23,6 +25,8 @@ public class Color {
     public final static Color TRANSPARENT = new Color(0);
 
     @ExposeField
+            @Getter
+            @Accessors(fluent = true)
     int rgba;
 
     public Color(int rgba) {
@@ -112,9 +116,6 @@ public class Color {
                 (int) ((b2 - b1) * fade + b1));
     }
 
-    public int getRgba() {
-        return rgba;
-    }
 
 
     public static int interpolateColor(int color1, int color2, float fraction) {

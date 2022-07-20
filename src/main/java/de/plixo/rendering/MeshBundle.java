@@ -87,12 +87,12 @@ public class MeshBundle implements RenderAsset {
                     if (mtl == null) {
                         texture = null;
                     } else {
-                        final var src = mtl.getMapKd();
+                        val src = mtl.getMapKd();
                         if (src == null) {
                             System.err.println("Image in " + mtl + " does not exists");
                             texture = null;
                         } else {
-                            final var file1 = new File(src);
+                            val file1 = new File(src);
                             if (!file1.exists()) {
                                 System.err.println("File " + src + " does not exists");
                             }

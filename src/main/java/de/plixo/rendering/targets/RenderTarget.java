@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +54,7 @@ public class RenderTarget extends Sealable implements RenderAsset {
 
     @Factory
     public static RenderTarget generate(int width, int height) {
-        final var framebuffer = Framebuffer.generate(width, height);
+        val framebuffer = Framebuffer.generate(width, height);
         return new RenderTarget(framebuffer, new HashMap<>());
     }
 
@@ -107,7 +108,7 @@ public class RenderTarget extends Sealable implements RenderAsset {
     public Texture new_texture(int target) {
         assertNotSealed();
         framebuffer.bind();
-        final var attachment = Texture.createAttachment(framebuffer.width(), framebuffer().height());
+        val attachment = Texture.createAttachment(framebuffer.width(), framebuffer().height());
         attach_texture(attachment, target);
         framebuffer.unbind();
         attachment.seal();
@@ -117,7 +118,7 @@ public class RenderTarget extends Sealable implements RenderAsset {
     public RenderBuffer new_buffer(int attachment, int storage) {
         assertNotSealed();
         framebuffer.bind();
-        final var attachment_ = RenderBuffer.generate(framebuffer.width(), framebuffer.height());
+        val attachment_ = RenderBuffer.generate(framebuffer.width(), framebuffer.height());
         attachment_.bind();
         attachment_.store(storage);
         attach_buffer(attachment_, attachment);
@@ -144,9 +145,9 @@ public class RenderTarget extends Sealable implements RenderAsset {
         return Objects.requireNonNull(attachments.get(target));
     }
 
-    public void render_texture(int x, int y, int x2, int y2, int type) {
+    public void render_texture(float x, float y, float x2, float y2, int type) {
         assertSealed();
-        final var texture = get(type).as_texture();
+        val texture = get(type).as_texture();
         texture.drawStatic(x, y, x2, y2, -1);
     }
 

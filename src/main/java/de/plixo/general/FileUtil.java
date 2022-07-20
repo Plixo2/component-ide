@@ -4,16 +4,64 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
+import de.plixo.game.meta.MetaTest;
+import lombok.val;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
+import org.plixo.gsonplus.GsonPlus;
+import org.plixo.gsonplus.GsonPlusBuilder;
+import org.plixo.gsonplus.GsonPlusConfig;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.function.Predicate;
 
 
 public class FileUtil {
+    static GsonPlusBuilder builder = new GsonPlusBuilder();
+    static GsonPlus serializer = new GsonPlus();
+
+
+    static {
+        GsonPlusConfig.setOverwriteLists(true);
+        GsonPlusConfig.setThrowObjectNullException(true);
+        GsonPlusConfig.setUseDefaultCase(true);
+        GsonPlusConfig.setClassLoader(FileUtil.class.getClassLoader());
+
+        GsonPlusConfig.addAdapter(Color.class, () -> new Color(0));
+        GsonPlusConfig.addAdapter(MetaTest.AbstractItem.class, () -> new MetaTest.AbstractItem(0,null));
+        GsonPlusConfig.addAdapter(MetaTest.AbstractItem2.class, () -> new MetaTest.AbstractItem2(0,null));
+        GsonPlusConfig.addPrimitive(Vector3f.class, new GsonPlusConfig.IObjectValue<Vector3f>() {
+            @Override
+            public Object toObject(JsonElement jsonElement) {
+                val str = jsonElement.getAsString();
+                assert str.startsWith("[");
+                assert str.endsWith("]");
+                val substring = str.substring(1, str.length() - 1);
+                val splits = substring.split(",");
+                assert splits.length == 3;
+                val x = Float.parseFloat(splits[0]);
+                val y = Float.parseFloat(splits[1]);
+                val z = Float.parseFloat(splits[2]);
+                return new Vector3f(x, y, z);
+            }
+
+            @Override
+            public Vector3f getDefault() {
+                return new Vector3f(0, 0, 0);
+            }
+
+            @Override
+            public String toString(Vector3f vector3f) {
+                return "[" + vector3f.x + "," + vector3f.y + "," + vector3f.z + "]";
+            }
+        });
+
+    }
 
     static JsonParser jsonParser = new JsonParser();
 
@@ -211,5 +259,18 @@ public class FileUtil {
         return new File("res/" + name);
     }
 
+
+    public static <T> T loadObj(@NotNull T dummy, @NotNull File file) throws ReflectiveOperationException {
+        val jsonElement = loadFromJson(file);
+        return (T) builder.create(dummy, jsonElement);
+    }
+
+    public static JsonElement writeObj(@NotNull Object object) throws ReflectiveOperationException {
+        return serializer.toJson(object);
+    }
+
+    public static void writeObj(@NotNull Object object, @NotNull File file) throws ReflectiveOperationException {
+        saveJsonObj(file,serializer.toJson(object));
+    }
 
 }

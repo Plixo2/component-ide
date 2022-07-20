@@ -48,7 +48,7 @@ public class Util {
         return rot + (rot > 0.0F ? -180.0F : 180.0F);
     }
 
-    static float clampAngle(float angle) {
+    public static float clampAngle(float angle) {
         angle %= 360.0F;
         if (angle >= 180.0F) {
             angle -= 360.0F;

@@ -54,9 +54,8 @@ public class UITextBox extends UIReference<String> {
     public void setDimensions(float x, float y, float width, float height) {
         assert reference != null;
         float insert = 5;
-        float textHeight = 16;
-        box = new TextBox(reference, GUI, KEYBOARD, insert, height / 2 - textHeight / 2, width - insert * 2,
-                textHeight);
+        float textHeight = Math.min(16,height-4);
+        box = new TextBox(reference, GUI, KEYBOARD, insert, height / 2 - textHeight / 2, width - insert * 2, textHeight);
         super.setDimensions(x, y, width, height);
     }
 }

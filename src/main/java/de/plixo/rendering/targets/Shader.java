@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix2f;
@@ -44,7 +45,7 @@ public class Shader extends Sealable implements RenderAsset {
 
     @Factory
     public static Shader fromDSA(String str) {
-        final var configShader = Dsa.compileToShader(str);
+        val configShader = Dsa.compileToShader(str);
         //preload all locations
         if (configShader.first.uniform != null) {
             configShader.first.uniform.forEach((name, type) -> {

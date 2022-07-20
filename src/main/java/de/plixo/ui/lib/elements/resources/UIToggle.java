@@ -10,6 +10,7 @@ import de.plixo.ui.lib.elements.visuals.UIEmpty;
 import de.plixo.ui.lib.general.ColorLib;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 public class UIToggle extends UIReference<Boolean> {
@@ -26,20 +27,20 @@ public class UIToggle extends UIReference<Boolean> {
     @Override
     public void drawScreen(float mouseX, float mouseY) {
 
-        final var state = reference.getValue();
+        val state = reference.getValue();
 
         defaultBackground();
         defaultHover();
         defaultUpdate(mouseX, mouseY);
 
-        GUI.drawRoundedRect(x+2, y + 2, x + height * 2 - 4, y + height - 2,30, primaryColor.getRgba());
+        GUI.drawRoundedRect(x+2, y + 2, x + height * 2 - 4, y + height - 2,30, primaryColor.rgba());
         GUI.drawLinedRoundedRect(x+2, y + 2, x + height * 2 - 4, y + height - 2,30,getOutlineColor(), 2f);
 
         int target = state ? 1 : -1;
         anim = Util.clamp01(anim + target * RenderSystem.INSTANCE.delta_time() * 4f);
-        final var color = new Color(0xFFFF2B39).mix(new Color(0xFF26DE38), anim);
-        final var line = Ease.OutExpo.animate(anim);
-        GUI.drawCircle(x + height/2 + ((height-2) * 1f * line), y + height / 2, height/2f - 5 , color.getRgba() );
+        val color = new Color(0xFFFF2B39).mix(new Color(0xFF26DE38), anim);
+        val line = Ease.OutExpo.animate(anim);
+        GUI.drawCircle(x + height/2 + ((height-2) * 1f * line), y + height / 2, height/2f - 5 , color.rgba() );
 
     }
 

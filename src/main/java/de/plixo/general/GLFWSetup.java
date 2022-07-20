@@ -38,8 +38,6 @@ public class GLFWSetup {
 
         glfwSetKeyCallback(window, (window_, key, scancode, action, mods) -> {
             Dispatcher.emit(new KeyEvent(key, scancode, action, mods));
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                glfwSetWindowShouldClose(window_, true);
         });
         ExposedReference<Vector2d> last = new ExposedReference<>(new Vector2d());
         glfwSetCursorPosCallback(window, (window_, x, y) -> {
@@ -58,7 +56,7 @@ public class GLFWSetup {
         }));
 
         glfwSetMouseButtonCallback(window, ((window_, button, action, mods) -> {
-            try (final var stack = stackPush()) {
+            try (val stack = stackPush()) {
                 val x = stack.mallocDouble(1);
                 val y = stack.mallocDouble(1);
                 glfwGetCursorPos(window, x, y);

@@ -3,6 +3,7 @@ package de.plixo.ui.lib.elements;
 
 import de.plixo.general.Color;
 import de.plixo.general.Util;
+import de.plixo.systems.RenderSystem;
 import de.plixo.ui.lib.general.ColorLib;
 import de.plixo.ui.lib.interfaces.IKeyboard;
 import de.plixo.ui.lib.interfaces.IMouse;
@@ -105,7 +106,8 @@ public abstract class UIElement implements IGuiEvent {
     protected void defaultUpdate(float mouseX, float mouseY) {
         updateHoverProgress(mouseX, mouseY);
         drawName(mouseX, mouseY);
-        if (isSelected()) drawOutline(selectionOutlineColor);
+        if (isSelected())
+            drawOutline(selectionOutlineColor);
     }
 
     protected void defaultHover() {
@@ -183,7 +185,7 @@ public abstract class UIElement implements IGuiEvent {
     }
 
 
-    protected boolean isHovered(float mouseX, float mouseY) {
+    public boolean isHovered(float mouseX, float mouseY) {
         return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height;
     }
 
@@ -203,10 +205,6 @@ public abstract class UIElement implements IGuiEvent {
         alignment = 1;
     }
 
-
-    public void copyDimensions(@NotNull UIElement element) {
-        setDimensions(element.x, element.y, element.width, element.height);
-    }
 
     private void drawName(@NotNull String name, int alignment) {
         if (alignment == -1) {
@@ -229,5 +227,26 @@ public abstract class UIElement implements IGuiEvent {
         if (outlineWidth > 0.01) {
             GUI.drawLinedRoundedRect(x, y, x + width, y + height, roundness, color, outlineWidth);
         }
+    }
+
+    public void scaleDimensions(UIElement element) {
+        this.width = element.width;
+        this.height = element.height;
+    }
+
+    public void scaleDimensions(float width, float height) {
+        setDimensions(this.x, this.y, width, height);
+    }
+
+    public void translateDimensions(float x, float y) {
+        setDimensions(x, y, this.width, this.height);
+    }
+
+    public void copyDimensions(@NotNull UIElement element) {
+        setDimensions(element.x, element.y, element.width, element.height);
+    }
+
+    public float aspect() {
+        return width/height;
     }
 }

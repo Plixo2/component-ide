@@ -1,0 +1,25 @@
+{
+    "items": [
+        {
+            "de.plixo.game.meta.MetaTest$AbstractItem": {
+                "name": "hello",
+                "amount": "13"
+            }
+        },
+        {
+            "de.plixo.game.meta.MetaTest$AbstractItem": {
+                "name": "asgd",
+                "amount": "-1"
+            }
+        },
+        {
+            "de.plixo.game.meta.MetaTest$AbstractItem2": {
+                "color": {
+                    "rgba": "-16711936"
+                },
+                "position": "[0.0,-1.0,100.0]",
+                "amount": "-1"
+            }
+        }
+    ]
+}

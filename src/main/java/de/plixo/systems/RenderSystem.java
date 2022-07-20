@@ -4,14 +4,16 @@ import de.plixo.event.Dispatcher;
 import de.plixo.event.SubscribeEvent;
 import de.plixo.event.impl.*;
 import de.plixo.general.Color;
-import de.plixo.rendering.Camera;
 import de.plixo.general.GLFWSetup;
+import de.plixo.rendering.Camera;
 import de.plixo.rendering.targets.RenderTarget;
 import de.plixo.ui.impl.FontRenderer;
 import de.plixo.ui.impl.GLFWKeyboard;
 import de.plixo.ui.impl.GLFWMouse;
 import de.plixo.ui.impl.OpenGlRenderer;
+import de.plixo.ui.impl.elements.UITexture;
 import de.plixo.ui.lib.UI;
+import de.plixo.ui.lib.elements.layout.UICanvas;
 import de.plixo.ui.lib.general.LodestoneUI;
 import de.plixo.ui.lib.general.UIManager;
 import lombok.Getter;
@@ -63,7 +65,16 @@ public class RenderSystem {
     @Accessors(fluent = true)
     private final Matrix4f projView = new Matrix4f();
 
+    @Getter
+    @Accessors(fluent = true)
     private RenderTarget worldTarget;
+
+    @Getter
+    @Setter
+    @Accessors(fluent = true)
+    private UICanvas worldcanvas;
+
+
 
 
     public void setup2D() {
@@ -76,7 +87,11 @@ public class RenderSystem {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glUseProgram(0);
-        worldTarget.render_texture(0, 0, width, height, GL_COLOR_ATTACHMENT0);
+//        worldTarget.render_texture(
+//               160 * UI_SCALE,
+//                30 * UI_SCALE,
+//                width,
+//                height,GL_COLOR_ATTACHMENT0);
     }
 
     public void setup3D() {
@@ -148,7 +163,6 @@ public class RenderSystem {
         UIManager.INSTANCE = new UIManager(width / UI_SCALE, height / UI_SCALE);
         val win = UIManager.displayWindow("Main");
         win.getCanvas().setColor(0);
-        Dispatcher.emit(new UIInitEvent(win.getCanvas()));
 
         if (worldTarget != null) {
             worldTarget.delete();
@@ -158,5 +172,7 @@ public class RenderSystem {
         worldTarget.new_texture(GL_COLOR_ATTACHMENT0);
         worldTarget.new_buffer(GL_DEPTH_STENCIL_ATTACHMENT, GL_DEPTH24_STENCIL8);
         worldTarget.seal();
+
+        Dispatcher.emit(new UIInitEvent(win.getCanvas()));
     }
 }

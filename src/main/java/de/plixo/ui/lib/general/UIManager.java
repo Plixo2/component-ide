@@ -10,7 +10,9 @@ import de.plixo.ui.lib.elements.UIElement;
 import de.plixo.ui.lib.elements.layout.UICanvas;
 import de.plixo.ui.lib.elements.layout.UIContext;
 import de.plixo.ui.lib.elements.layout.UIDraggable;
+import de.plixo.ui.lib.elements.other.UIPopup;
 import lombok.Getter;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Stack;
@@ -23,7 +25,7 @@ public class UIManager implements IGuiEvent {
     public static UIManager INSTANCE;
     public static float reduceModalSize = 0.2f;
     @Getter
-    float width, height;
+    public float width, height;
     public float mouseX, mouseY;
 
     public UIManager(float width, float height) {
@@ -49,7 +51,7 @@ public class UIManager implements IGuiEvent {
         return window;
     }
 
-    public static Window displayModalWindow(String name) {
+    public static Window displayModalWindow(String name, boolean isPopup) {
         UICanvas canvas = new UICanvas();
         canvas.setHoverColor(0);
 
@@ -64,10 +66,16 @@ public class UIManager implements IGuiEvent {
             }
         };
         INSTANCE.stack.push(window);
+        if (isPopup) {
+            UIPopup popup = new UIPopup();
+            popup.scaleDimensions(canvas);
+            canvas.add(popup);
+        }
+
         return window;
     }
 
-    public static Window displayDraggableModalWindow(String name, float headSize) {
+    public static Window displayDraggableModalWindow(String name, float headSize, boolean isPopUp) {
         UICanvas canvas = new UIDraggable();
         canvas.setDimensions(INSTANCE.width * reduceModalSize, INSTANCE.height * reduceModalSize,
                 INSTANCE.width * (1 - reduceModalSize * 2), headSize);
@@ -89,6 +97,47 @@ public class UIManager implements IGuiEvent {
                 closeWindow(this);
             }
         };
+
+        if (isPopUp) {
+            UIPopup popup = new UIPopup();
+            popup.scaleDimensions(full);
+            full.add(popup);
+        }
+
+        INSTANCE.stack.push(window);
+        return window;
+    }
+
+    public static Window addWindow(String name, UICanvas canvas) {
+        //enable translation
+        val subCan = new UICanvas();
+        subCan.add(canvas);
+        Window window = new Window(name, subCan, subCan) {
+            @Override
+            public void dispose() {
+                super.dispose();
+                closeWindow(this);
+            }
+        };
+        INSTANCE.stack.push(window);
+        return window;
+    }
+    public static Window addPopUp(UICanvas canvas) {
+        //enable translation
+        val subCan = new UICanvas();
+        subCan.add(canvas);
+        subCan.scaleDimensions(canvas);
+        Window window = new Window("", subCan, subCan) {
+            @Override
+            public void dispose() {
+                super.dispose();
+                closeWindow(this);
+            }
+        };
+        UIPopup popup = new UIPopup();
+        popup.scaleDimensions(canvas);
+        canvas.add(popup);
+
         INSTANCE.stack.push(window);
         return window;
     }
@@ -118,7 +167,10 @@ public class UIManager implements IGuiEvent {
         glEnable(GL_SCISSOR_TEST);
         ((OpenGlRenderer) UIElement.GUI).scissorStack.clear();
         UIElement.GUI.pushScissor(0, 0, width * UI_SCALE, height * UI_SCALE);
-        stack.forEach(ref -> ref.internal.drawScreen(mouseX, mouseY));
+        for (int i = 0; i < stack.size() - 1; i++) {
+            stack.get(i).internal.drawScreen(-10000, -100000);
+        }
+        stack.peek().internal.drawScreen(mouseX, mouseY);
         glDisable(GL_SCISSOR_TEST);
     }
 
@@ -207,6 +259,7 @@ public class UIManager implements IGuiEvent {
 
 
     static int fps = 0;
+
     @SubscribeEvent
     static void tick(@NotNull TickEvent event) {
         assert INSTANCE != null;
@@ -241,11 +294,11 @@ public class UIManager implements IGuiEvent {
 
     @SubscribeEvent
     static void draw(@NotNull Render2DEvent event) {
-//        assert INSTANCE != null;
-//        UIElement.GUI.pushMatrix();
-//        UIElement.GUI.scale(UI_SCALE, UI_SCALE);
-//        INSTANCE.drawScreen(IO.getMouse().x / UI_SCALE, IO.getMouse().y / UI_SCALE);
-//        UIElement.GUI.popMatrix();
+        assert INSTANCE != null;
+        UIElement.GUI.pushMatrix();
+        UIElement.GUI.scale(UI_SCALE, UI_SCALE);
+        INSTANCE.drawScreen(IO.getMouse().x / UI_SCALE, IO.getMouse().y / UI_SCALE);
+        UIElement.GUI.popMatrix();
 
     }
 }

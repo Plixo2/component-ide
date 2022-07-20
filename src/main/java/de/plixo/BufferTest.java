@@ -1,15 +1,32 @@
 package de.plixo;
 
-import de.plixo.general.Color;
+import de.plixo.game.meta.MetaTest;
+import de.plixo.general.FileUtil;
+import lombok.val;
 
+import java.io.File;
 import java.io.IOException;
-
-import static org.lwjgl.opengl.GL11.*;
+import java.util.HashMap;
 
 
 public class BufferTest {
-    public static void main(String[] args) throws IOException {
-//        final var l = MainHook.initGlfw();
+    public static void main(String[] args) throws ReflectiveOperationException {
+
+        val file = new File("saves/test.txt");
+        FileUtil.makeFile(file);
+
+        MetaTest list = new MetaTest();
+        FileUtil.writeObj(list,file);
+
+
+        final var dummy = new MetaTest();
+        FileUtil.loadObj(dummy,file);
+
+
+        System.out.println(dummy.items);
+
+
+//        val l = MainHook.initGlfw();
 //        GL.createCapabilities();
 //        int w = 0;
 //        int h = 0;
@@ -19,8 +36,8 @@ public class BufferTest {
 //            glfwGetWindowSize(l, pWidth, pHeight);
 //            final GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 //            assert vidmode != null;
-//            final var width1 = pWidth.get(0);
-//            final var height1 = pHeight.get(0);
+//            val width1 = pWidth.get(0);
+//            val height1 = pHeight.get(0);
 //            w = width1;
 //            h = height1;
 //            glfwSetWindowPos(l, (vidmode.width() - width1) / 2,
@@ -40,7 +57,7 @@ public class BufferTest {
 //                1.0f, -1.0f,  1.0f, 0.0f,
 //                1.0f,  1.0f,  1.0f, 1.0f
 //        };
-//        final var layout = new Shader.Attribute[]{Shader.Attribute.Vec2, Shader.Attribute.Vec2};
+//        val layout = new Shader.Attribute[]{Shader.Attribute.Vec2, Shader.Attribute.Vec2};
 //        Mesh mesh = Mesh.from_raw(quadVertices,new int[]{0,1,2,3,4,5}, layout,0,null);
 //        Shader shader = Dsa.compileToShader("fullscreen.toml").second;
 //
@@ -87,15 +104,15 @@ public class BufferTest {
 //        }
     }
 
-    public static void drawRect(float left, float top, float right, float bottom, Color color) {
-
-        glDisable(GL_TEXTURE_2D);
-        color.bindGl();
-        glBegin(GL_QUADS);
-        glVertex2d(left, bottom);
-        glVertex2d(right, bottom);
-        glVertex2d(right, top);
-        glVertex2d(left, top);
-        glEnd();
-    }
+//    public static void drawRect(float left, float top, float right, float bottom, Color color) {
+//
+//        glDisable(GL_TEXTURE_2D);
+//        color.bindGl();
+//        glBegin(GL_QUADS);
+//        glVertex2d(left, bottom);
+//        glVertex2d(right, bottom);
+//        glVertex2d(right, top);
+//        glVertex2d(left, top);
+//        glEnd();
+//    }
 }

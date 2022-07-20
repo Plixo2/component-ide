@@ -6,7 +6,10 @@ import de.plixo.ui.lib.general.UIManager;
 
 public class UIPopup extends UICanvas {
 
-
+    public UIPopup() {
+        setColor(0);
+        setHoverColor(0);
+    }
     @Override
     public void mouseClicked(float mouseX, float mouseY, int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);

@@ -8,6 +8,9 @@ public class UIDraggable extends UICanvas {
     private float offsetX = 0;
     private float offsetY = 0;
 
+    public boolean isEnabled = true;
+
+
     @Setter
     int gridLock = 1;
 
@@ -17,7 +20,7 @@ public class UIDraggable extends UICanvas {
     @Override
     public void drawScreen(float mouseX, float mouseY) {
         super.drawScreen(mouseX, mouseY);
-        if (isDragged()) {
+        if (isDragged() && isEnabled) {
             x = (mouseX + offsetX);
             y = (mouseY + offsetY);
 
@@ -28,7 +31,7 @@ public class UIDraggable extends UICanvas {
 
     @Override
     public void mouseClicked(float mouseX, float mouseY, int mouseButton) {
-        if(isHovered(mouseX , mouseY) && mouseButton == 0) {
+        if(isHovered(mouseX , mouseY) && mouseButton == 0 && isEnabled) {
             offsetX = x-mouseX;
             offsetY = y-mouseY;
         }
@@ -38,5 +41,10 @@ public class UIDraggable extends UICanvas {
     @Override
     public void mouseReleased(float mouseX, float mouseY, int state) {
         super.mouseReleased(mouseX,mouseY,state);
+    }
+
+
+    public void disable() {
+        this.isEnabled = false;
     }
 }

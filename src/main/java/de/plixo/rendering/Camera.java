@@ -4,12 +4,13 @@ import de.plixo.event.SubscribeEvent;
 import de.plixo.event.impl.MouseMoveEvent;
 import de.plixo.event.impl.Render3DEvent;
 import de.plixo.event.impl.ScrollEvent;
-import de.plixo.general.Util;
 import de.plixo.general.IO;
+import de.plixo.general.Util;
 import de.plixo.systems.RenderSystem;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -20,8 +21,12 @@ public class Camera {
     @Getter
     @Setter
     @Accessors(fluent = true)
-    private float yaw;
-    private float pitch;
+    private float yaw = 45;
+
+    @Getter
+    @Setter
+    @Accessors(fluent = true)
+    private float pitch = -45;
 
     @Getter
     @Setter
@@ -47,7 +52,6 @@ public class Camera {
     private float yOffset = 0;
 
     public void rotate(float yaw, float pitch) {
-
         this.pitch = Util.clampFloat((this.pitch + pitch), 89.9f, -89.9f);
         this.yaw += yaw;
     }
@@ -65,14 +69,14 @@ public class Camera {
             return orthographic();
         }
         final Matrix4f projection = new Matrix4f();
-        float aspect = RenderSystem.INSTANCE.width() / (float) RenderSystem.INSTANCE.height();
+        float aspect = RenderSystem.INSTANCE.worldcanvas().aspect();
         projection.perspective((float) Math.toRadians(fov), aspect, 0.01f, 10000f, true);
         return projection;
     }
 
     private Matrix4f orthographic() {
         final Matrix4f projection = new Matrix4f();
-        float aspect = RenderSystem.INSTANCE.width() / (float) RenderSystem.INSTANCE.height();
+        float aspect = RenderSystem.INSTANCE.worldcanvas().aspect();
         float size = distance / 2.0f;
 
         projection.ortho(-size * aspect * 1, size * aspect, -size, size,
@@ -83,8 +87,8 @@ public class Camera {
 
 
     public @NotNull Vector3f position() {
-        final var yaw = Math.toRadians(this.yaw);
-        final var pitch = Math.toRadians(this.pitch);
+        val yaw = Math.toRadians(this.yaw);
+        val pitch = Math.toRadians(this.pitch);
 
         final double x = Math.cos(yaw) * Math.cos(pitch);
         final double z = Math.sin(yaw) * Math.cos(pitch);
@@ -102,8 +106,8 @@ public class Camera {
     }
 
     public @NotNull Vector3f forward() {
-        final var yaw = Math.toRadians(this.yaw);
-        final var pitch = Math.toRadians(this.pitch);
+        val yaw = Math.toRadians(this.yaw);
+        val pitch = Math.toRadians(this.pitch);
         final double x = Math.cos(yaw) * Math.cos(pitch);
         final double z = Math.sin(yaw) * Math.cos(pitch);
         final double y = Math.sin(pitch);
@@ -145,8 +149,8 @@ public class Camera {
     void drawCameraRing() {
 //        float x = 0;
 //        while (x <= Math.PI * 2) {
-//            final var pos = new Vector3f((float) Math.sin(x) * xOffset, yOffset, (float) Math.cos(x) * xOffset);
-//            final var end = new Vector3f((float) Math.sin(x + 0.1f) * xOffset, yOffset,
+//            val pos = new Vector3f((float) Math.sin(x) * xOffset, yOffset, (float) Math.cos(x) * xOffset);
+//            val end = new Vector3f((float) Math.sin(x + 0.1f) * xOffset, yOffset,
 //                    (float) Math.cos(x + 0.1f) * xOffset);
 //            Debug.drawLine(pos.add(origin), end.add(origin), Color.RED);
 //            x += 0.1f;

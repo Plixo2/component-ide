@@ -47,8 +47,8 @@ public class UIColor extends UIReference<Color> {
             this.add(number);
 
             red.addObserver(a -> {
-                final var value = reference.getValue();
-                value.overwrite(new Color((int) (a * 255), value.green(), value.blue(), value.alpha()).getRgba());
+                val value = reference.getValue();
+                value.overwrite(new Color((int) (a * 255), value.green(), value.blue(), value.alpha()).rgba());
             });
         }
         {
@@ -66,8 +66,8 @@ public class UIColor extends UIReference<Color> {
             this.add(number);
 
             green.addObserver(a -> {
-                final var value = reference.getValue();
-                value.overwrite(new Color(value.red(), (int) (a * 255), value.blue(), value.alpha()).getRgba());
+                val value = reference.getValue();
+                value.overwrite(new Color(value.red(), (int) (a * 255), value.blue(), value.alpha()).rgba());
             });
         }
         {
@@ -85,8 +85,8 @@ public class UIColor extends UIReference<Color> {
             this.add(number);
 
             blue.addObserver(a -> {
-                final var value = reference.getValue();
-                value.overwrite(new Color(value.red(), value.green(), (int) (a * 255), value.alpha()).getRgba());
+                val value = reference.getValue();
+                value.overwrite(new Color(value.red(), value.green(), (int) (a * 255), value.alpha()).rgba());
             });
         }
         {
@@ -104,22 +104,22 @@ public class UIColor extends UIReference<Color> {
             this.add(number);
 
             alpha.addObserver(a -> {
-                final var value = reference.getValue();
-                value.overwrite(new Color(value.red(), value.green(), value.blue(), (int) (a * 255)).getRgba());
+                val value = reference.getValue();
+                value.overwrite(new Color(value.red(), value.green(), value.blue(), (int) (a * 255)).rgba());
             });
         }
 
-        final var stringWidth = GUI.getStringWidth("#FFFFFFFF");
+        val stringWidth = GUI.getStringWidth("#FFFFFFFF");
         UIElement drawer = new UIElement() {
             @Override
             public void drawScreen(float mouseX, float mouseY) {
-                final var value = reference.getValue();
+                val value = reference.getValue();
                 final String hex =
                         String.format("#%02X%02X%02X%02X", value.red(), value.green(), value.blue(), value.alpha());
-                final var left = x + width - stringWidth - 4;
+                val left = x + width - stringWidth - 4;
                 GUI.drawString(hex, left, y + height / 2, ColorLib.getTextColor());
                 GUI.drawRoundedRect(x + 1, y + 1, left - 1, y + height - 1, 300, -1);
-                GUI.drawRoundedRect(x + 2, y + 2, left - 2, y + height - 2, 300, value.getRgba());
+                GUI.drawRoundedRect(x + 2, y + 2, left - 2, y + height - 2, 300, value.rgba());
             }
         };
         drawer.setDimensions(0, h * 4, width, h);

@@ -59,8 +59,8 @@ public class Debug {
     }
 
     public static void drawLine(@NotNull Vector3f a, @NotNull Vector3f b, @NotNull Color color) {
-        final var a_ = new Vector3f(a).add(offset);
-        final var b_ = new Vector3f(b).add(offset);
+        val a_ = new Vector3f(a).add(offset);
+        val b_ = new Vector3f(b).add(offset);
         lines.add(new Line(a_, b_, color));
     }
 

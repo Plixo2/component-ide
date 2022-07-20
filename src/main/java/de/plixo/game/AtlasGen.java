@@ -2,31 +2,26 @@ package de.plixo.game;
 
 import de.plixo.general.Tuple;
 import de.plixo.rendering.targets.Texture;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AtlasGen {
 
-    public static @NotNull Tuple<HashMap<BufferedImage, Vector2i>, BufferedImage> generate(Collection<BufferedImage> textures, int dim) {
+    public static @NotNull Tuple<HashMap<BufferedImage, Vector2i>, BufferedImage> generate(Collection<BufferedImage> textures, int dim, boolean fix) {
         BufferedImage img = new BufferedImage(dim, dim, BufferedImage.TYPE_INT_ARGB);
-        final var graphics = img.getGraphics();
+        val graphics = img.getGraphics();
         val map = new HashMap<BufferedImage, Vector2i>();
         val sorted = textures.stream().sorted((t1, t0) -> t0.getWidth() - t1.getWidth());
         AtomicInteger y = new AtomicInteger();
         AtomicInteger x = new AtomicInteger();
         AtomicInteger last = new AtomicInteger();
-        final var iterator = sorted.iterator();
+        val iterator = sorted.iterator();
         while (iterator.hasNext()) {
             val texture = iterator.next();
             if (y.get() > img.getHeight() - texture.getHeight() + 2) {
@@ -35,10 +30,18 @@ public class AtlasGen {
                 last.set(0);
             }
 
-            graphics.drawImage(texture, x.get() + 2, y.get() + 1, texture.getWidth(), texture.getHeight(), null);
-            graphics.drawImage(texture, x.get(), y.get() + 1, texture.getWidth(), texture.getHeight(), null);
-            graphics.drawImage(texture, x.get() + 1, y.get() + 2, texture.getWidth(), texture.getHeight(), null);
-            graphics.drawImage(texture, x.get() + 1, y.get(), texture.getWidth(), texture.getHeight(), null);
+            if (fix) {
+                graphics.drawImage(texture, x.get() + 2, y.get() + 2, texture.getWidth(), texture.getHeight(), null);
+                graphics.drawImage(texture, x.get(), y.get(), texture.getWidth(), texture.getHeight(), null);
+                graphics.drawImage(texture, x.get(), y.get() + 2, texture.getWidth(), texture.getHeight(), null);
+                graphics.drawImage(texture, x.get() + 2, y.get(), texture.getWidth(), texture.getHeight(), null);
+
+                graphics.drawImage(texture, x.get() + 2, y.get() + 1, texture.getWidth(), texture.getHeight(), null);
+                graphics.drawImage(texture, x.get(), y.get() + 1, texture.getWidth(), texture.getHeight(), null);
+                graphics.drawImage(texture, x.get() + 1, y.get() + 2, texture.getWidth(), texture.getHeight(), null);
+                graphics.drawImage(texture, x.get() + 1, y.get(), texture.getWidth(), texture.getHeight(), null);
+            }
+
 
             graphics.drawImage(texture, x.get() + 1, y.get() + 1, texture.getWidth(), texture.getHeight(), null);
 
@@ -46,7 +49,7 @@ public class AtlasGen {
             y.addAndGet(texture.getHeight() + 2);
             last.set(Math.max(last.get(), texture.getWidth() + 2));
             if (x.get() + texture.getWidth() + 2 > img.getWidth()) {
-                return generate(textures, dim * 2);
+                return generate(textures, dim * 2,false);
             }
         }
 
@@ -77,9 +80,9 @@ public class AtlasGen {
 //                throw new RuntimeException(e);
 //            }
 //        }
-//        final var generate = generate(images, 64);
+//        val generate = generate(images, 64);
 //        try {
-//            final var graphics = generate.second.getGraphics();
+//            val graphics = generate.second.getGraphics();
 //            generate.first.forEach((img, coord) -> {
 //                graphics.drawRect(coord.x, coord.y, img.getWidth(), img.getHeight());
 //            });

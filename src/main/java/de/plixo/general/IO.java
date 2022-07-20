@@ -15,6 +15,14 @@ public class IO {
     @Setter
     private static Vector2f mouse = new Vector2f();
 
+    @Getter
+    @Setter
+    private static Vector2f canvasMouse = new Vector2f();
+    @Getter
+    @Setter
+    private static Vector2f canvasPosition = new Vector2f();
+
+
     public static boolean mouseDown(int key) {
         return glfwGetMouseButton(RenderSystem.INSTANCE.window(), key) == GLFW_PRESS;
     }

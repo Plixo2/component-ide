@@ -5,6 +5,7 @@ import de.plixo.general.RenderAsset;
 import de.plixo.general.Sealable;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.MemoryUtil;
 
@@ -41,7 +42,7 @@ public class Texture extends Sealable implements RenderAsset {
 
     @Factory
     public static Texture createAttachment(int width, int height) {
-        final var texture = new Texture(width, height);
+        val texture = new Texture(width, height);
         texture.bind();
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -97,7 +98,6 @@ public class Texture extends Sealable implements RenderAsset {
     }
 
     public void drawStatic(float left, float top, float right, float bottom, int color) {
-        assertSealed();
         drawStatic(left, top, right, bottom, 0, 0, 1, 1, color);
     }
 

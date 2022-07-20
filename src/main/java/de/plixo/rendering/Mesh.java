@@ -2,7 +2,7 @@ package de.plixo.rendering;
 
 import de.plixo.general.Factory;
 import de.plixo.general.RenderAsset;
-import de.plixo.game.collision.CollisionMesh;
+import de.plixo.general.collision.CollisionMesh;
 import de.plixo.rendering.targets.Shader;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -55,9 +55,9 @@ public class Mesh implements RenderAsset {
         ArrayList<CollisionMesh.Vertex> vertices_ = new ArrayList<>();
 
         while (vertices.hasRemaining()) {
-            final var x = vertices.get() * scale;
-            final var y = vertices.get() * scale;
-            final var z = vertices.get() * scale;
+            val x = vertices.get() * scale;
+            val y = vertices.get() * scale;
+            val z = vertices.get() * scale;
             list[size++] = x;
             list[size++] = y;
             list[size++] = z;
@@ -81,7 +81,7 @@ public class Mesh implements RenderAsset {
             indices_.add(indices_List[builder++] = indices.get());
         }
 
-        final var collision = (flags & GENERATE_COLLISION) == GENERATE_COLLISION ? new CollisionMesh(vertices_,
+        val collision = (flags & GENERATE_COLLISION) == GENERATE_COLLISION ? new CollisionMesh(vertices_,
                 indices_) : null;
         return from_raw(list, indices_List,
                 new Shader.Attribute[]{
