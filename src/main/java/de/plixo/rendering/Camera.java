@@ -6,7 +6,9 @@ import de.plixo.event.impl.Render3DEvent;
 import de.plixo.event.impl.ScrollEvent;
 import de.plixo.general.IO;
 import de.plixo.general.Util;
-import de.plixo.systems.RenderSystem;
+import de.plixo.state.Assets;
+import de.plixo.event.AssetServer;
+import de.plixo.systems.UISystem;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -51,6 +53,8 @@ public class Camera {
     @Accessors(fluent = true)
     private float yOffset = 0;
 
+    private boolean fps = false;
+
     public void rotate(float yaw, float pitch) {
         this.pitch = Util.clampFloat((this.pitch + pitch), 89.9f, -89.9f);
         this.yaw += yaw;
@@ -65,18 +69,19 @@ public class Camera {
     }
 
     public Matrix4f projection() {
+        fps = UISystem.reflectBool("FPS", false);
         if (!perspective) {
             return orthographic();
         }
         final Matrix4f projection = new Matrix4f();
-        float aspect = RenderSystem.INSTANCE.worldcanvas().aspect();
+        float aspect = AssetServer.get(Assets.WorldCanvas.class).worldCanvas().aspect();
         projection.perspective((float) Math.toRadians(fov), aspect, 0.01f, 10000f, true);
         return projection;
     }
 
     private Matrix4f orthographic() {
         final Matrix4f projection = new Matrix4f();
-        float aspect = RenderSystem.INSTANCE.worldcanvas().aspect();
+        float aspect = AssetServer.get(Assets.WorldCanvas.class).worldCanvas().aspect();
         float size = distance / 2.0f;
 
         projection.ortho(-size * aspect * 1, size * aspect, -size, size,
@@ -87,25 +92,40 @@ public class Camera {
 
 
     public @NotNull Vector3f position() {
-        val yaw = Math.toRadians(this.yaw);
-        val pitch = Math.toRadians(this.pitch);
+        if (fps) {
+            return origin;
+        } else {
+            val yaw = Math.toRadians(this.yaw);
+            val pitch = Math.toRadians(this.pitch);
 
-        final double x = Math.cos(yaw) * Math.cos(pitch);
-        final double z = Math.sin(yaw) * Math.cos(pitch);
-        final double y = Math.sin(pitch);
+            final double x = Math.cos(yaw) * Math.cos(pitch);
+            final double z = Math.sin(yaw) * Math.cos(pitch);
+            final double y = Math.sin(pitch);
 
-        float distance = perspective ? this.distance : 30;
-        return new Vector3f(origin()).sub((float) (x * distance), (float) (y * distance),
-                (float) (z * distance));
+            float distance = perspective ? this.distance : 30;
+            return new Vector3f(origin()).sub((float) (x * distance), (float) (y * distance),
+                    (float) (z * distance));
+        }
     }
 
-    public Vector3f origin() {
-        final float xL = (float) Math.cos(Math.toRadians(yaw + 90)) * -xOffset;
-        final float zL = (float) Math.sin(Math.toRadians(yaw + 90)) * -xOffset;
-        return new Vector3f(origin).add(xL, yOffset, zL);
+    private Vector3f origin() {
+        if (fps) {
+            val yaw = Math.toRadians(this.yaw);
+            val pitch = Math.toRadians(this.pitch);
+            var origin = new Vector3f(this.origin);
+            val x = (float) (Math.cos(yaw) * Math.cos(pitch));
+            val z = (float) (Math.sin(yaw) * Math.cos(pitch));
+            val y = (float) Math.sin(pitch);
+            return origin.add(x, y, z);
+
+        } else {
+            final float xL = (float) Math.cos(Math.toRadians(yaw + 90)) * -xOffset;
+            final float zL = (float) Math.sin(Math.toRadians(yaw + 90)) * -xOffset;
+            return new Vector3f(origin).add(xL, yOffset, zL);
+        }
     }
 
-    public @NotNull Vector3f forward() {
+    private @NotNull Vector3f forward() {
         val yaw = Math.toRadians(this.yaw);
         val pitch = Math.toRadians(this.pitch);
         final double x = Math.cos(yaw) * Math.cos(pitch);
@@ -118,12 +138,16 @@ public class Camera {
     @SubscribeEvent
     void rotate(@NotNull MouseMoveEvent event) {
         float speed = 0.25f;
-        if (IO.mouseDown(1)) {
+        if (fps) {
             rotate((float) (event.delta().x * speed), (float) (-event.delta().y * speed));
-        } else if (IO.mouseDown(2)) {
-            xOffset += event.delta().x * 0.001f * this.distance;
-            yOffset += event.delta().y * 0.001f * this.distance;
-            Debug.draw(this::drawCameraRing, 4f);
+        } else {
+            if (IO.mouseDown(1)) {
+                rotate((float) (event.delta().x * speed), (float) (-event.delta().y * speed));
+            } else if (IO.mouseDown(2)) {
+                xOffset += event.delta().x * 0.001f * this.distance;
+                yOffset += event.delta().y * 0.001f * this.distance;
+                Debug.draw(this::drawCameraRing, 4f);
+            }
         }
     }
 

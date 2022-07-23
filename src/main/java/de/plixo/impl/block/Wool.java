@@ -1,4 +1,4 @@
 package de.plixo.impl.block;
 
-public class Wool extends Simple {
+public abstract class Wool extends Simple {
 }

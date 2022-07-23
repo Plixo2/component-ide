@@ -8,7 +8,7 @@ import de.plixo.rendering.BlockRenderer;
 import de.plixo.state.UIState;
 import de.plixo.ui.lib.elements.layout.UIAlign;
 import de.plixo.ui.lib.elements.layout.UICanvas;
-import de.plixo.ui.impl.elements.UITexture;
+import de.plixo.impl.ui.UITexture;
 import de.plixo.ui.lib.elements.layout.UIDraggable;
 import de.plixo.ui.lib.general.ColorLib;
 import lombok.AllArgsConstructor;
@@ -36,11 +36,11 @@ public class PlacePanel {
     @SubscribeEvent
     static void ui(@NotNull UIChildEvent event) throws IOException {
         val canvas = event.canvas();
-        UICanvas top = new UICanvas();
-        top.setDimensions(160, 0, canvas.width - 160, 30);
-        top.setRoundness(0);
-        top.setColor(0xFF0A0A0A);
-        canvas.add(top);
+//        UICanvas top = new UICanvas();
+//        top.setDimensions(160, 0, canvas.width - 160, 30);
+//        top.setRoundness(0);
+//        top.setColor(0xFF0A0A0A);
+//        canvas.add(top);
 
 
         UIAlign align = new UIAlign();
@@ -151,8 +151,8 @@ public class PlacePanel {
 //        });
     }
 
-    static <T extends Block> void drawEntry(Block2DEntry<T> entry, Matrix4f max) {
-        entry.renderer.draw(entry.block, entry.mesh, max);
+    static <T extends Block> void drawEntry(Block2DEntry<T> entry, Matrix4f mat) {
+        entry.renderer.draw(entry.block, mat);
     }
 
 }

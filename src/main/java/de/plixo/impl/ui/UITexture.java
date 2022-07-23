@@ -1,4 +1,4 @@
-package de.plixo.ui.impl.elements;
+package de.plixo.impl.ui;
 
 import de.plixo.rendering.targets.Texture;
 import de.plixo.ui.lib.elements.UIElement;

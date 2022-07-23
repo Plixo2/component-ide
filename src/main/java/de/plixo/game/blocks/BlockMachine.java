@@ -7,7 +7,7 @@ import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockMachine extends InventoryBlock {
+public abstract class BlockMachine extends InventoryBlock {
     private boolean eject = false;
     private boolean input = false;
 

@@ -2,10 +2,10 @@ package de.plixo.rendering;
 
 import de.javagl.obj.*;
 import de.plixo.general.Factory;
-import de.plixo.general.RenderAsset;
 import de.plixo.general.Tuple;
 import de.plixo.rendering.targets.Shader;
 import de.plixo.rendering.targets.Texture;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -15,36 +15,21 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-
-public class MeshBundle implements RenderAsset {
-
+@AllArgsConstructor
+public class MeshTexture {
     @Getter
     @Accessors(fluent = true)
-    private @NotNull RenderObj[] objs;
-
+    private @Nullable Texture texture;
     @Getter
     @Accessors(fluent = true)
-    private @Nullable Shader commonShader = null;
-
-    public MeshBundle(@NotNull RenderObj[] objs) {
-        this.objs = objs;
-        computeCommonShader();
-    }
-
+    private @NotNull Mesh mesh;
 
     @Factory
-    public static @NotNull MeshBundle generate(@NotNull Mesh mesh, @NotNull String shader_path) {
-        val shader_obj = Shader.fromDSA(shader_path);
-        return new MeshBundle(new RenderObj[]{new RenderObj(shader_obj, null, mesh)});
-    }
-    @Factory
-    public static @NotNull Tuple<MeshBundle, Shader> generate(@NotNull String obj_path, @NotNull String mat_path,
-                                                              @NotNull String shader_path, int flags) throws IOException {
+    public static @NotNull MeshTexture[] generate(@NotNull String obj_path, @NotNull String mat_path) throws IOException {
         var obj_file = new File("content/model/" + obj_path);
         if (!obj_file.exists()) {
             obj_file = new File("content/" + obj_path);
@@ -57,24 +42,27 @@ public class MeshBundle implements RenderAsset {
         val inputStream = new FileInputStream(obj_file);
         val read = MtlReader.read(new FileInputStream(mtl_file));
         val map = new HashMap<String, Mtl>();
+        String mat_ = "";
         for (Mtl mtl : read) {
+            mat_ = mtl.getName();
             map.put(mtl.getName(), mtl);
         }
-        var full_obj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
-        val stringObjMap = ObjSplitting.splitByMaterialGroups(full_obj);
-        val shader_obj = Shader.fromDSA(shader_path);
-        val objs = new RenderObj[stringObjMap.size()];
+        String mat = mat_;
+        final var input = ObjReader.read(inputStream);
+//        System.out.println("s");
+//        System.out.println(ObjSplitting.splitByMaterialGroups(input).size());
+//        System.out.println(input.getNumGroups());
+        var full_obj = ObjUtils.convertToRenderable(input);
+        val stringObjMap = ObjSplitting.splitByGroups(full_obj);
+        val objs = new MeshTexture[stringObjMap.size()];
         val index = new AtomicInteger();
 
-
-        stringObjMap.forEach((mat, obj) -> {
+        stringObjMap.forEach((unused,obj) -> {
             val indices = ObjData.getFaceVertexIndices(obj);
             val vertices = ObjData.getVertices(obj);
             val texCoords = ObjData.getTexCoords(obj, 2);
             val normals = ObjData.getNormals(obj);
-
-            val mesh = Mesh.from_buffers(indices, vertices, texCoords, normals,
-                    flags | Mesh.SCALE_HALF | Mesh.GENERATE_COLLISION);
+            val mesh = Mesh.from_buffers(indices, vertices, texCoords, normals, Mesh.SCALE_HALF | Mesh.GENERATE_COLLISION);
             Texture texture;
             try {
                 var path = "content/textures/" + mat + ".png";
@@ -107,47 +95,11 @@ public class MeshBundle implements RenderAsset {
             if (texture != null) {
                 texture.seal();
             }
-            val renderObj = new RenderObj(shader_obj, texture, mesh);
+
+            val renderObj = new MeshTexture(texture, mesh);
+
             objs[index.getAndIncrement()] = renderObj;
         });
-        shader_obj.seal();
-        return new Tuple<>(new MeshBundle(objs), shader_obj);
+        return  Arrays.copyOf(objs,index.get());
     }
-
-    private void computeCommonShader() {
-        if (objs.length == 0) {
-            this.commonShader = null;
-            return;
-        }
-        this.commonShader = objs[0].shader();
-        for (RenderObj obj : objs) {
-            if (!commonShader.equals(obj.shader())) {
-                this.commonShader = null;
-                return;
-            }
-        }
-    }
-
-    @Override
-    public void render() {
-        for (final RenderObj obj : objs) {
-            obj.shader().flush();
-            if (obj.texture() != null) {
-//                glEnable(GL_TEXTURE_2D);
-                glActiveTexture(GL_TEXTURE0);
-                obj.texture().bind();
-            } else {
-//                glDisable(GL_TEXTURE_2D);
-            }
-            obj.mesh().render();
-        }
-    }
-
-    public MeshTexture extract(int i) {
-        assert i >= 0 && i < this.objs.length;
-        final var obj = objs[i];
-        return new MeshTexture(obj.texture(),obj.mesh());
-    }
-
-
 }

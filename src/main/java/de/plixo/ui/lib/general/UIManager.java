@@ -3,6 +3,7 @@ package de.plixo.ui.lib.general;
 import de.plixo.event.SubscribeEvent;
 import de.plixo.event.impl.*;
 import de.plixo.general.IO;
+import de.plixo.state.UIState;
 import de.plixo.systems.RenderSystem;
 import de.plixo.ui.impl.OpenGlRenderer;
 import de.plixo.ui.lib.elements.IGuiEvent;
@@ -264,7 +265,7 @@ public class UIManager implements IGuiEvent {
     static void tick(@NotNull TickEvent event) {
         assert INSTANCE != null;
         INSTANCE.onTick();
-        fps = Math.round(1f / RenderSystem.INSTANCE.delta_time());
+        fps = Math.round(1f / UIState.delta_time());
     }
 
     @SubscribeEvent

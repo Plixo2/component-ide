@@ -3,6 +3,7 @@ package de.plixo.ui.lib.elements.resources;
 import de.plixo.animation.Ease;
 import de.plixo.general.Color;
 import de.plixo.general.Util;
+import de.plixo.state.UIState;
 import de.plixo.systems.RenderSystem;
 import de.plixo.ui.lib.elements.UIElement;
 import de.plixo.ui.lib.elements.UIReference;
@@ -37,7 +38,7 @@ public class UIToggle extends UIReference<Boolean> {
         GUI.drawLinedRoundedRect(x+2, y + 2, x + height * 2 - 4, y + height - 2,30,getOutlineColor(), 2f);
 
         int target = state ? 1 : -1;
-        anim = Util.clamp01(anim + target * RenderSystem.INSTANCE.delta_time() * 4f);
+        anim = Util.clamp01(anim + target * UIState.delta_time() * 4f);
         val color = new Color(0xFFFF2B39).mix(new Color(0xFF26DE38), anim);
         val line = Ease.OutExpo.animate(anim);
         GUI.drawCircle(x + height/2 + ((height-2) * 1f * line), y + height / 2, height/2f - 5 , color.rgba() );

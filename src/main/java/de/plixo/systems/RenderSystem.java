@@ -1,5 +1,6 @@
 package de.plixo.systems;
 
+import de.plixo.event.AssetServer;
 import de.plixo.event.Dispatcher;
 import de.plixo.event.SubscribeEvent;
 import de.plixo.event.impl.*;
@@ -7,17 +8,14 @@ import de.plixo.general.Color;
 import de.plixo.general.GLFWSetup;
 import de.plixo.rendering.Camera;
 import de.plixo.rendering.targets.RenderTarget;
+import de.plixo.state.Assets;
 import de.plixo.ui.impl.FontRenderer;
 import de.plixo.ui.impl.GLFWKeyboard;
 import de.plixo.ui.impl.GLFWMouse;
 import de.plixo.ui.impl.OpenGlRenderer;
-import de.plixo.ui.impl.elements.UITexture;
-import de.plixo.ui.lib.UI;
-import de.plixo.ui.lib.elements.layout.UICanvas;
 import de.plixo.ui.lib.general.LodestoneUI;
 import de.plixo.ui.lib.general.UIManager;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -37,44 +35,19 @@ import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class RenderSystem {
-    public static RenderSystem INSTANCE;
     public static float UI_SCALE = 2f;
 
-    @Getter()
-    @Setter
-    @Accessors(fluent = true)
-    private long window;
 
     @Getter
     @Accessors(fluent = true)
-    private int width;
+    private int unscaled_width;
     @Getter
     @Accessors(fluent = true)
-    private int height;
-
-    @Getter
-    @Accessors(fluent = true)
-    private Camera camera;
-
-    @Getter
-    @Setter
-    @Accessors(fluent = true)
-    float delta_time;
-
-    @Getter
-    @Accessors(fluent = true)
-    private final Matrix4f projView = new Matrix4f();
+    private int unscaled_height;
 
     @Getter
     @Accessors(fluent = true)
     private RenderTarget worldTarget;
-
-    @Getter
-    @Setter
-    @Accessors(fluent = true)
-    private UICanvas worldcanvas;
-
-
 
 
     public void setup2D() {
@@ -83,29 +56,24 @@ public class RenderSystem {
         worldTarget.popBuffer();
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, width, height, 0, -1, 1);
+        glOrtho(0, unscaled_width, unscaled_height, 0, -1, 1);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glUseProgram(0);
-//        worldTarget.render_texture(
-//               160 * UI_SCALE,
-//                30 * UI_SCALE,
-//                width,
-//                height,GL_COLOR_ATTACHMENT0);
     }
 
     public void setup3D() {
         worldTarget.pushBuffer(Color.WHITE);
 
-        if (UI.reflectBool("Outlines", false)) {
+        if (UISystem.reflectBool("Outlines", false)) {
             glDisable(GL_CULL_FACE);
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         } else {
             glCullFace(GL_BACK);
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
-
-        camera().perspective(UI.reflectBool("Perspective", true));
+        final var camera = AssetServer.get(Camera.class);
+        camera.perspective(UISystem.reflectBool("Perspective", true));
 
         final Matrix4f projectionMatrix = camera.projection();
         final Matrix4f viewMatrix = camera.view();
@@ -116,23 +84,20 @@ public class RenderSystem {
             glMatrixMode(GL_MODELVIEW);
             glLoadMatrixf(viewMatrix.get(stack.mallocFloat(16)));
         }
+        val projView = new Matrix4f();
         projectionMatrix.mul(viewMatrix, projView);
-
+        AssetServer.update(new Assets.ProjView(projView));
     }
 
-    public boolean shouldClose() {
-        return glfwWindowShouldClose(window);
-    }
 
     @SubscribeEvent
     void init(@NotNull InitEvent event) {
         val init = GLFWSetup.initGlfw();
-        window = init.first;
-        width = init.second;
-        height = init.third;
+        AssetServer.update(new Assets.Window(init.first));
+        unscaled_width = init.second;
+        unscaled_height = init.third;
 
-        camera = new Camera();
-        Dispatcher.register(camera);
+        AssetServer.insertAndRegister(new Camera());
 
         GL.createCapabilities();
     }
@@ -141,11 +106,12 @@ public class RenderSystem {
     void postInit(@NotNull PostInitEvent event) {
         OpenGlRenderer.setFontRenderer(new FontRenderer(new Font("Verdana", Font.BOLD, 18)));
         new LodestoneUI(new OpenGlRenderer(), new GLFWKeyboard(), new GLFWMouse());
-        Dispatcher.emit(new ResizeEvent(new Vector2i(width, height)));
+        Dispatcher.emit(new ResizeEvent(new Vector2i(unscaled_width, unscaled_height)));
     }
 
     @SubscribeEvent
     void shutdown(@NotNull ShutDownEvent event) {
+        final var window = AssetServer.get(Assets.Window.class).id();
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
         glfwTerminate();
@@ -157,10 +123,10 @@ public class RenderSystem {
 
     @SubscribeEvent
     void resize(@NotNull ResizeEvent event) {
-        width = event.size().x;
-        height = event.size().y;
+        unscaled_width = event.size().x;
+        unscaled_height = event.size().y;
 
-        UIManager.INSTANCE = new UIManager(width / UI_SCALE, height / UI_SCALE);
+        UIManager.INSTANCE = new UIManager(unscaled_width / UI_SCALE, unscaled_height / UI_SCALE);
         val win = UIManager.displayWindow("Main");
         win.getCanvas().setColor(0);
 
@@ -168,11 +134,13 @@ public class RenderSystem {
             worldTarget.delete();
         }
 
-        worldTarget = RenderTarget.generate(width, height);
+        worldTarget = RenderTarget.generate(unscaled_width, unscaled_height);
         worldTarget.new_texture(GL_COLOR_ATTACHMENT0);
         worldTarget.new_buffer(GL_DEPTH_STENCIL_ATTACHMENT, GL_DEPTH24_STENCIL8);
         worldTarget.seal();
 
         Dispatcher.emit(new UIInitEvent(win.getCanvas()));
     }
+
+
 }

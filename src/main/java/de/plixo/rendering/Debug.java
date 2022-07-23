@@ -5,7 +5,7 @@ import de.plixo.event.impl.PostInitEvent;
 import de.plixo.event.impl.Render3DEvent;
 import de.plixo.general.Color;
 import de.plixo.rendering.targets.Shader;
-import de.plixo.ui.lib.UI;
+import de.plixo.systems.UISystem;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -131,13 +131,13 @@ public class Debug {
                 delays.remove(ref);
             }
         });
-        if (!UI.reflectBool("debug depth", true)) {
+        if (!UISystem.reflectBool("debug depth", true)) {
             glDisable(GL_DEPTH_TEST);
         }
         glEnable(GL_BLEND);
 
 
-        float size = UI.reflectFloat("debug size", 5, 0, 10);
+        float size = UISystem.reflectFloat("debug size", 5, 0, 10);
         glPointSize(size);
         glLineWidth(size);
 

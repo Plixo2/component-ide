@@ -8,25 +8,21 @@ import org.plixo.gsonplus.ExposeField;
 import static org.lwjgl.opengl.GL11.glColor4f;
 
 public class Color {
-
-    public static final Color YELLOW =  new Color(0xFFFFFF00);;
-    public static final Color ORANGE = new Color( 0xFFFF8800);
-    public static final Color PURPLE = new Color( 0xFFA832A6);
-    public static float DARKER_FADE = 0.2f;
-    public static float BRIGHTER_FADE = 0.2f;
-
+    public static final Color YELLOW = new Color(0xFFFFFF00);
+    public static final Color ORANGE = new Color(0xFFFF8800);
+    public static final Color PURPLE = new Color(0xFFA832A6);
     public final static Color BLACK = new Color(0xFF000000);
     public final static Color WHITE = new Color(0xFFFFFFFF);
-
     public final static Color RED = new Color(0xFFFF0000);
     public final static Color GREEN = new Color(0xFF00FF00);
     public final static Color BLUE = new Color(0xFF0000FF);
-
     public final static Color TRANSPARENT = new Color(0);
 
+    public static float DARKER_FADE = 0.2f;
+    public static float BRIGHTER_FADE = 0.2f;
     @ExposeField
-            @Getter
-            @Accessors(fluent = true)
+    @Getter
+    @Accessors(fluent = true)
     int rgba;
 
     public Color(int rgba) {
@@ -56,7 +52,7 @@ public class Color {
 
 
     public float[] toArray() {
-        return new float[] {red()/255f,green()/255f,blue()/255f,alpha()/255f};
+        return new float[]{red() / 255f, green() / 255f, blue() / 255f, alpha() / 255f};
     }
 
     public Color(int r, int g, int b) {
@@ -115,7 +111,6 @@ public class Color {
                 (int) ((g2 - g1) * fade + g1) << 8 |
                 (int) ((b2 - b1) * fade + b1));
     }
-
 
 
     public static int interpolateColor(int color1, int color2, float fraction) {

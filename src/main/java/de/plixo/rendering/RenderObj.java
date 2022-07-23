@@ -1,4 +1,4 @@
-package de.plixo.game;
+package de.plixo.rendering;
 
 import de.plixo.rendering.Mesh;
 import de.plixo.rendering.targets.Shader;

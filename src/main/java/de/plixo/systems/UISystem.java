@@ -1,13 +1,14 @@
-package de.plixo.ui.lib;
+package de.plixo.systems;
 
-import de.plixo.animation.Animation;
 import de.plixo.animation.Ease;
+import de.plixo.event.AssetServer;
 import de.plixo.event.Dispatcher;
 import de.plixo.event.SubscribeEvent;
 import de.plixo.event.impl.InitEvent;
 import de.plixo.event.impl.ShutDownEvent;
 import de.plixo.event.impl.UIChildEvent;
 import de.plixo.event.impl.UIInitEvent;
+import de.plixo.game.ItemInventory;
 import de.plixo.general.Color;
 import de.plixo.general.FileUtil;
 import de.plixo.general.IO;
@@ -15,12 +16,15 @@ import de.plixo.general.Util;
 import de.plixo.general.reference.InterfaceReference;
 import de.plixo.general.reference.ObjectReference;
 import de.plixo.general.reference.Reference;
+import de.plixo.impl.ui.UIInventory;
+import de.plixo.impl.ui.UITexture;
+import de.plixo.rendering.Camera;
+import de.plixo.state.Assets;
 import de.plixo.state.UIState;
-import de.plixo.systems.RenderSystem;
-import de.plixo.ui.impl.elements.UITexture;
 import de.plixo.ui.lib.elements.UIReference;
 import de.plixo.ui.lib.elements.layout.UIAlign;
 import de.plixo.ui.lib.elements.layout.UICanvas;
+import de.plixo.ui.lib.elements.other.UIKeyAction;
 import de.plixo.ui.lib.elements.resources.*;
 import de.plixo.ui.lib.elements.visuals.UIEmpty;
 import de.plixo.ui.lib.general.ColorLib;
@@ -28,33 +32,33 @@ import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
-import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
 
-public class UI {
+public class UISystem {
 
 
     @SubscribeEvent
-    static void ui(@NotNull UIInitEvent event) {
+    void ui(@NotNull UIInitEvent event) {
         final UICanvas canvas = event.canvas();
         UICanvas left = new UICanvas();
         left.setDimensions(0, 0, 160, canvas.height);
         left.setRoundness(0);
-        left.setColor(0xFF0A0A0A);
+        left.setColor(0);
         canvas.add(left);
 
         UICanvas worldCanvas = new UICanvas();
         worldCanvas.setColor(0);
         worldCanvas.setRoundness(0);
-        worldCanvas.setDimensions(160, 30, canvas.width - 160, canvas.height - 30);
-        canvas.add(worldCanvas);
-        RenderSystem.INSTANCE.worldcanvas(worldCanvas);
+        worldCanvas.setDimensions(0, 0, canvas.width, canvas.height);
+        AssetServer.update(new Assets.WorldCanvas(worldCanvas));
         final var tex = new UITexture() {
             @Override
             public void drawScreen(float mouseX, float mouseY) {
@@ -64,23 +68,100 @@ public class UI {
         };
         tex.scaleDimensions(worldCanvas);
         worldCanvas.add(tex);
-        tex.texture(
-                        RenderSystem.INSTANCE.worldTarget().get(GL_COLOR_ATTACHMENT0).as_texture()
-                );
-//        IO.setCanvasPosition(new Vector2f(worldCanvas.x,worldCanvas.y));
+        tex.texture(AssetServer.get(RenderSystem.class).worldTarget().get(GL_COLOR_ATTACHMENT0).as_texture());
+        canvas.add(worldCanvas);
 
-        UIAlign align = new UIAlign();
-        align.setSpacing(4);
-        align.setDimensions(0, 40, 160, canvas.height - 40);
-        align.enableScissor();
-        UIState.debugList = align;
-        canvas.add(align);
+        //debug
+        {
+            UIAlign align = new UIAlign();
+            align.setColor(0xFF0A0A0A);
+            align.setSpacing(4);
+            align.setRoundness(0);
+            align.setDimensions(-100, 0, 100, canvas.height);
+            align.disableScissor();
+            UIState.debugList = align;
+            canvas.add(align);
+            UICanvas top_bar = align.add(new UICanvas());
+            top_bar.setDimensions(0, 0, 0, 15);
+            val button = top_bar.add(new UIButton());
+            button.setColor(ColorLib.getBackground(0.1f));
+            button.setOutlineWidth(0);
+            button.setDimensions(align.width, 0, 10, 10);
+            button.setDisplayName("<");
+            button.disableTextShadow();
+            AtomicBoolean toggle = new AtomicBoolean(false);
+            final var width = align.width;
+            button.setAction(() -> {
+                if (!toggle.get()) {
+                    AnimationSystem.animate(ref -> {
+                        align.x = ref;
+                    }, -width, 0f, 0.2f, Ease.InOutSine);
+                } else {
+                    AnimationSystem.animate(ref -> {
+                        align.x = ref;
+                    }, 0, -width, 0.2f, Ease.InOutSine);
+                }
+                toggle.set(!toggle.get());
+            });
+            top_bar.add(UIKeyAction.wrap(new ObjectReference<>(GLFW.GLFW_KEY_T), button));
+            UIEmpty empty = top_bar.add(new UIEmpty());
+            empty.setDimensions(0, 0, top_bar.width, top_bar.height);
+            empty.alignTextLeft();
+            empty.setDisplayName("Debug");
+        }
+
+        //inventory
+        {
+            UICanvas inv = canvas.add(new UICanvas());
+            inv.setDimensions(0, canvas.height - 100, canvas.width, 120);
+            inv.setColor(0xFF0A0A0A);
+
+            ItemInventory inventory = new ItemInventory(128, 1);
+            UIInventory inv_ = inv.add(new UIInventory());
+            inv_.autoWrap(true);
+            inv_.setInv(inventory);
+            inv_.itemSize((inv.width - 20) / 20f);
+            inv_.setDimensions(10, 10, inv.width - 20, inv.height - 30);
+
+            UIScrollBar scrollBar = inv.add(new UIScrollBar());
+            scrollBar.setDimensions(2.5f, 4, 5, inv.height - (20+4));
+            scrollBar.setReference(new InterfaceReference<>(s -> {
+                assert inv_.getVertical() != null;
+                inv_.getVertical().setPercent(s);
+            }, () -> {
+                assert inv_.getVertical() != null;
+                return inv_.getVertical().getPercent();
+            }));
+
+            val button = inv.add(new UIButton());
+            button.setColor(ColorLib.getBackground(0.1f));
+            button.setRoundness(2);
+            button.setDimensions(0, -10, 10, 10);
+            button.setDisplayName("v");
+            button.disableTextShadow();
+
+            AtomicBoolean toggle = new AtomicBoolean(false);
+            final var height = canvas.height - 100;
+            button.setAction(() -> {
+                if (!toggle.get()) {
+                    AnimationSystem.animate(ref -> {
+                        inv.y = ref;
+                    }, height, canvas.height, 0.2f, Ease.InOutSine);
+                } else {
+                    AnimationSystem.animate(ref -> {
+                        inv.y = ref;
+                    },  canvas.height, height, 0.2f, Ease.InOutSine);
+                }
+                toggle.set(!toggle.get());
+            });
+            inv.add(UIKeyAction.wrap(new ObjectReference<>(GLFW.GLFW_KEY_SPACE), button));
+        }
 
 
         UIFillBar camDistance = new UIFillBar();
         camDistance.setDimensions(165, canvas.height - 8, canvas.width - 190, 6);
-        camDistance.setReference(new InterfaceReference<>(RenderSystem.INSTANCE.camera()::xOffset,
-                RenderSystem.INSTANCE.camera()::xOffset));
+        final Camera camera = AssetServer.get(Camera.class);
+        camDistance.setReference(new InterfaceReference<>(camera::xOffset, camera::xOffset));
         camDistance.setMin(-5);
         camDistance.setMax(5);
         camDistance.setDraggable(true);
@@ -88,8 +169,7 @@ public class UI {
 
         UIScrollBar scrollBar = new UIScrollBar();
         scrollBar.setDimensions(canvas.width - 8, 35, 6, canvas.height - 60);
-        scrollBar.setReference(new InterfaceReference<>(RenderSystem.INSTANCE.camera()::yOffset,
-                RenderSystem.INSTANCE.camera()::yOffset));
+        scrollBar.setReference(new InterfaceReference<>(camera::yOffset, camera::yOffset));
         scrollBar.min(-5);
         scrollBar.max(5);
         canvas.add(scrollBar);
@@ -103,47 +183,13 @@ public class UI {
         reset.add(texture);
         canvas.add(reset);
         reset.setAction(() -> {
-            Animation.animate(s -> {
-                RenderSystem.INSTANCE.camera().xOffset(s);
-            }, RenderSystem.INSTANCE.camera().xOffset(), 0, 0.5f, Ease.InOutQuint);
-            Animation.animate(s -> {
-                RenderSystem.INSTANCE.camera().yOffset(s);
-            }, RenderSystem.INSTANCE.camera().yOffset(), 0, 0.5f, Ease.InOutQuint);
-
-            RenderSystem.INSTANCE.camera().yaw(Util.clampAngle(RenderSystem.INSTANCE.camera().yaw()));
-            Animation.animate(s -> {
-                RenderSystem.INSTANCE.camera().yaw(s);
-            }, RenderSystem.INSTANCE.camera().yaw(), 45, 1f, Ease.InOutQuint);
-
-            Animation.animate(s -> {
-                RenderSystem.INSTANCE.camera().pitch(s);
-            }, RenderSystem.INSTANCE.camera().pitch(), -45, 0.5f, Ease.InOutQuint);
+            AnimationSystem.animate(camera::xOffset, camera.xOffset(), 0, 0.5f, Ease.InOutQuint);
+            AnimationSystem.animate(camera::yOffset, camera.yOffset(), 0, 0.5f, Ease.InOutQuint);
+            camera.yaw(Util.clampAngle(camera.yaw()));
+            AnimationSystem.animate(camera::yaw, camera.yaw(), 45, 1f, Ease.InOutQuint);
+            AnimationSystem.animate(camera::pitch, camera.pitch(), -45, 0.5f, Ease.InOutQuint);
         });
 
-
-        UINumber x_center = new UINumber();
-        x_center.setReference(new InterfaceReference<>(s -> {
-            final Vector3f origin = RenderSystem.INSTANCE.camera().origin();
-            origin.x = s;
-        }, () -> RenderSystem.INSTANCE.camera().origin().x));
-        x_center.setDimensions(10, 10, 40, 20);
-        left.add(x_center);
-
-        UINumber y_center = new UINumber();
-        y_center.setReference(new InterfaceReference<>(s -> {
-            final Vector3f origin = RenderSystem.INSTANCE.camera().origin();
-            origin.y = s;
-        }, () -> RenderSystem.INSTANCE.camera().origin().y));
-        y_center.setDimensions(60, 10, 40, 20);
-        left.add(y_center);
-
-        UINumber z_center = new UINumber();
-        z_center.setReference(new InterfaceReference<>(s -> {
-            final Vector3f origin = RenderSystem.INSTANCE.camera().origin();
-            origin.z = s;
-        }, () -> RenderSystem.INSTANCE.camera().origin().z));
-        z_center.setDimensions(110, 10, 40, 20);
-        left.add(z_center);
 
         Dispatcher.emit(new UIChildEvent(canvas));
 
@@ -230,8 +276,8 @@ public class UI {
         }).getValue();
     }
 
-    public static <T> Reference<T> reflect(@NotNull String name, @Nullable T defaults, Function<T,
-            UIReference<T>> callback) {
+    public static <T> Reference<T> reflect(@NotNull String name, @Nullable T defaults,
+                                           Function<T, UIReference<T>> callback) {
         val id = name.hashCode();
         val contains = rememberedSets.containsKey(id);
         if (!contains) {
@@ -261,7 +307,7 @@ public class UI {
 
 
     @SubscribeEvent
-    static void shutDown(@NotNull ShutDownEvent event) {
+    void shutDown(@NotNull ShutDownEvent event) {
         final StringBuilder builder = new StringBuilder();
         rememberedSets.forEach((k, v) -> {
             builder.append(k).append("?").append(v.getReference().getValue().getClass().getName()).append(":")
@@ -272,7 +318,7 @@ public class UI {
     }
 
     @SubscribeEvent
-    static void load(@NotNull InitEvent event) {
+    void load(@NotNull InitEvent event) {
         try {
             val str = FileUtil.loadAsString("content/config.txt");
             val split = str.split("\n");
@@ -298,7 +344,6 @@ public class UI {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
 }

@@ -1,34 +1,30 @@
 package de.plixo.impl.render;
 
 import de.plixo.impl.block.Simple;
-import de.plixo.rendering.MeshBundle;
 import de.plixo.rendering.BlockRenderer;
-import de.plixo.rendering.targets.Shader;
+import de.plixo.rendering.MeshTexture;
+import de.plixo.rendering.targets.Texture;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+
 public class SimpleRenderer extends BlockRenderer<Simple> {
 
-    final Shader.Uniform projview;
-    final Shader.Uniform model;
+    public SimpleRenderer() {
 
-
-    public SimpleRenderer(Shader shader) {
-        projview = shader.uniform("projview");
-        model = shader.uniform("model");
     }
 
     @Override
-    public void draw(@NotNull Simple block, @NotNull MeshBundle meshBundle, @NotNull Matrix4f projection) {
-        projview.load(projection);
+    public void draw(@NotNull Simple block, @NotNull Matrix4f projection) {
+        final var shader = block.getShader();
+        shader.uniform("projview").load(projection);
         final Matrix4f t = new Matrix4f();
         t.translate(block.x() + 0.5f, block.y() + 0.5f, block.z() + 0.5f);
-        model.load(t);
-//        glPushMatrix();
-//        glTranslatef(block.x, block.y, block.z);
-//        Debug.gizmo();
-//        glPopMatrix();
-
-        super.draw(block, meshBundle, projection);
+        shader.uniform("model").load(t);
+        shader.flush();
+        super.draw(block,projection);
     }
 }

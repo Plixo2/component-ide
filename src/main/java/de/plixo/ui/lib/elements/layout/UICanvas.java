@@ -29,8 +29,9 @@ public class UICanvas extends UIElement {
         this.setColor(0);
     }
 
-    public void add(UIElement element) {
+    public <T extends UIElement> T add(T element) {
         elements.add(element);
+        return element;
     }
 
     public void remove(UIElement element) {

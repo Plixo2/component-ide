@@ -6,7 +6,8 @@ import de.plixo.general.RenderAsset;
 import de.plixo.general.Sealable;
 import de.plixo.general.dsa.Dsa;
 import de.plixo.general.reference.Reference;
-import de.plixo.systems.RenderSystem;
+import de.plixo.state.Assets;
+import de.plixo.event.AssetServer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -154,7 +155,7 @@ public class Shader extends Sealable implements RenderAsset {
         Object t;
 
         public void loadProjView() {
-            load(RenderSystem.INSTANCE.projView());
+            load(AssetServer.get(Assets.ProjView.class).matrix());
         }
 
         public void loadIdentity() {

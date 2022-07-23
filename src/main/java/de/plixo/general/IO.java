@@ -2,7 +2,8 @@ package de.plixo.general;
 
 import de.plixo.event.SubscribeEvent;
 import de.plixo.event.impl.MouseMoveEvent;
-import de.plixo.systems.RenderSystem;
+import de.plixo.state.Assets;
+import de.plixo.event.AssetServer;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -24,11 +25,12 @@ public class IO {
 
 
     public static boolean mouseDown(int key) {
-        return glfwGetMouseButton(RenderSystem.INSTANCE.window(), key) == GLFW_PRESS;
+
+        return glfwGetMouseButton(AssetServer.get(Assets.Window.class).id(), key) == GLFW_PRESS;
     }
 
     public static boolean keyDown(int key) {
-        return glfwGetKey(RenderSystem.INSTANCE.window(), key) == GLFW_PRESS;
+        return glfwGetKey(AssetServer.get(Assets.Window.class).id(), key) == GLFW_PRESS;
     }
 
 

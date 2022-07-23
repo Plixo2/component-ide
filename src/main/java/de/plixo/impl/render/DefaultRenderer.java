@@ -1,20 +1,14 @@
 package de.plixo.impl.render;
 
-import de.plixo.game.blocks.InventoryBlock;
+import de.plixo.impl.block.Pipe;
 import de.plixo.rendering.BlockRenderer;
-import de.plixo.rendering.MeshTexture;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-
-public class InventoryBlockRenderer extends BlockRenderer<InventoryBlock> {
-
+public class DefaultRenderer extends BlockRenderer<Pipe> {
 
     @Override
-    public void draw(@NotNull InventoryBlock block, @NotNull Matrix4f projection) {
+    public void draw(@NotNull Pipe block, @NotNull Matrix4f projection) {
         final var shader = block.getShader();
         shader.uniform("projview").load(projection);
         final Matrix4f t = new Matrix4f();

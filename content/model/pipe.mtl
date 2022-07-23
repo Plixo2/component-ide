@@ -1,7 +1,7 @@
 # Blender MTL File: 'blender_scene.blend'
-# Material Count: 4
+# Material Count: 2
 
-newmtl Material.001
+newmtl pipe_mat
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -10,9 +10,9 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd C:\\Users\\Mo\\Desktop\\Maus.PNG
+map_Kd C:\\Users\\Mo\\Documents\\cargo_game\\content\\textures\\blocks\\pipe.png
 
-newmtl Material.002
+newmtl pipe_pipe
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -21,26 +21,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd C:\\Users\\Mo\\Pictures\\2020-08-08_15.44.22.png
-
-newmtl Material.003
-Ns 225.000000
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 2
-map_Kd C:\\Users\\Mo\\Pictures\\2020-08-08_15.43.14.png
-
-newmtl Material.004
-Ns 225.000000
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 2
-map_Kd C:\\Users\\Mo\\Desktop\\paper.png
+map_Kd C:\\Users\\Mo\\Documents\\cargo_game\\content\\textures\\blocks\\pipe.png

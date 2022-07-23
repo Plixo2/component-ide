@@ -5,7 +5,7 @@ import de.plixo.event.impl.UIChildEvent;
 import de.plixo.game.ItemInventory;
 import de.plixo.ui.lib.elements.UIElement;
 import de.plixo.ui.lib.elements.layout.UIContext;
-import de.plixo.ui.impl.elements.UIInventory;
+import de.plixo.impl.ui.UIInventory;
 import de.plixo.ui.lib.general.ColorLib;
 import de.plixo.ui.lib.general.UIManager;
 import org.jetbrains.annotations.NotNull;

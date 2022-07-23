@@ -84,6 +84,11 @@ public abstract class UIElement implements IGuiEvent {
     @Nullable String hoverName = null;
     long lastMs = 0;
 
+    @Getter
+    @Setter
+    boolean textShadow = true;
+
+
     public UIElement() {
         super();
         setRoundness(DEFAULT_ROUNDNESS);
@@ -207,14 +212,26 @@ public abstract class UIElement implements IGuiEvent {
 
 
     private void drawName(@NotNull String name, int alignment) {
-        if (alignment == -1) {
-            GUI.drawStringWithShadow(name, x + 3, y + height / 2, ColorLib.getTextColor());
-        } else if (alignment == 1) {
-            GUI.drawStringWithShadow(name, x + width - (GUI.getStringWidth(name) + 3), y + height / 2,
-                    ColorLib.getTextColor());
+        if(textShadow) {
+            if (alignment == -1) {
+                GUI.drawStringWithShadow(name, x + 3, y + height / 2, ColorLib.getTextColor());
+            } else if (alignment == 1) {
+                GUI.drawStringWithShadow(name, x + width - (GUI.getStringWidth(name) + 3), y + height / 2,
+                        ColorLib.getTextColor());
+            } else {
+                GUI.drawCenteredStringWithShadow(name, x + width / 2, y + height / 2, ColorLib.getTextColor());
+            }
         } else {
-            GUI.drawCenteredStringWithShadow(name, x + width / 2, y + height / 2, ColorLib.getTextColor());
+            if (alignment == -1) {
+                GUI.drawString(name, x + 3, y + height / 2, ColorLib.getTextColor());
+            } else if (alignment == 1) {
+                GUI.drawString(name, x + width - (GUI.getStringWidth(name) + 3), y + height / 2,
+                        ColorLib.getTextColor());
+            } else {
+                GUI.drawCenteredString(name, x + width / 2, y + height / 2, ColorLib.getTextColor());
+            }
         }
+
     }
 
 
@@ -230,8 +247,7 @@ public abstract class UIElement implements IGuiEvent {
     }
 
     public void scaleDimensions(UIElement element) {
-        this.width = element.width;
-        this.height = element.height;
+        scaleDimensions(element.width,element.height);
     }
 
     public void scaleDimensions(float width, float height) {
@@ -248,5 +264,14 @@ public abstract class UIElement implements IGuiEvent {
 
     public float aspect() {
         return width/height;
+    }
+
+
+    public void enableTextShadow() {
+        textShadow = true;
+    }
+
+    public void disableTextShadow() {
+        textShadow = false;
     }
 }

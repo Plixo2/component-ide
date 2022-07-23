@@ -2,21 +2,21 @@ package de.plixo.game.blocks;
 
 import de.plixo.game.Block;
 import de.plixo.game.ItemInventory;
-import de.plixo.ui.impl.elements.UIInventory;
+import de.plixo.impl.ui.UIInventory;
 import de.plixo.ui.lib.elements.layout.UICanvas;
 import de.plixo.ui.lib.general.ColorLib;
 import de.plixo.ui.lib.general.UIManager;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
-public class InventoryBlock extends Block {
+public abstract class InventoryBlock extends Block {
     private final ItemFilter inputFilter = new ItemFilter();
     private final ItemFilter ejectionFilter = new ItemFilter();
 
     protected @Nullable ItemInventory inventory = null;
 
     @Override
-    public void interact() {
+    public boolean interact() {
         assert inventory != null;
 //        val inventory_debug = UIManager.displayDraggableModalWindow("Inventory Debug", 10, true);
         val canvas = new UICanvas();
@@ -31,5 +31,6 @@ public class InventoryBlock extends Block {
                 UIManager.INSTANCE.height/2 - canvas.height/2 ,canvas.width,canvas.height );
 
         UIManager.addPopUp(canvas);
+        return true;
     }
 }

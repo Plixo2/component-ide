@@ -30,7 +30,7 @@ source = '''
     float env = 0.3f;
     float dirEnv = 1-env;
 
-    vec3 dir = normalize(vec3(0.2,0.4,0.6));
+    vec3 dir = normalize(vec3(-0.2,0.4,-0.6));
     float dirLight = (dot(aNormal,dir) +1.0 ) * 0.5;
     light = env + dirLight * dirEnv;
     normal = aNormal;

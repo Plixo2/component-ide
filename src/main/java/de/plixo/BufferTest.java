@@ -1,29 +1,83 @@
 package de.plixo;
 
-import de.plixo.game.meta.MetaTest;
 import de.plixo.general.FileUtil;
+import de.plixo.systems.ItemSystem;
+import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
 import java.io.File;
-import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 
 public class BufferTest {
+
+    @SneakyThrows
+    static void forFile(@NotNull File file) {
+        if(file.getName().endsWith(".png")) {
+        System.out.println("file " + file.getName());
+            val img = ImageIO.read(file);
+        }
+
+        final var directory = file.isDirectory();
+        if (directory) {
+        final var files = file.listFiles();
+            for (File listFile : files) {
+                forFile(listFile);
+            }
+        }
+    }
+
     public static void main(String[] args) throws ReflectiveOperationException {
 
-        val file = new File("saves/test.txt");
-        FileUtil.makeFile(file);
 
-        MetaTest list = new MetaTest();
-        FileUtil.writeObj(list,file);
-
-
-        final var dummy = new MetaTest();
-        FileUtil.loadObj(dummy,file);
+        HashMap<Class<?>, Object> objects = new HashMap<>();
+        objects.put(Integer.class, 0);
+        objects.put(Float.class, 0f);
+        objects.put(Boolean.class, false);
+        objects.put(ItemSystem.class, new ItemSystem());
 
 
-        System.out.println(dummy.items);
+        for (int j = 0; j < 10; j++) {
+            val ms = System.currentTimeMillis();
+            final float iter = 10000000f;
+            for (int i = 0; i < iter; i++) {
+                objects.get(Integer.class);
+                objects.get(Float.class);
+                objects.get(Boolean.class);
+                objects.get(ItemSystem.class);
+            }
+            final var time = System.currentTimeMillis() - ms;
+            System.out.println("Time: " + time);
+            System.out.println("for " + j);
+            System.out.println(time / iter + "ms per loop");
+        }
+
+        val ms = System.currentTimeMillis();
+        File fi = new File("content/");
+        forFile(fi);
+        final var time = System.currentTimeMillis() - ms;
+        System.out.println("Time: " + time + "ms");
+
+
+//        FileUtils.eq
+//        System.out.println(new Path("content").equals(new File("C:\\Users\\Mo\\Documents\\cargo_game\\content")));
+
+//        val file = new File("saves/test.txt");
+//        FileUtil.makeFile(file);
+//
+//        MetaTest list = new MetaTest();
+//        FileUtil.writeObj(list,file);
+//
+//
+//        final var dummy = new MetaTest();
+//        FileUtil.loadObj(dummy,file);
+//
+//
+//        System.out.println(dummy.items);
 
 
 //        val l = MainHook.initGlfw();

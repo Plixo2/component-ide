@@ -1,4 +1,4 @@
-package de.plixo.ui.impl.elements;
+package de.plixo.impl.ui;
 
 import de.plixo.game.item.ItemStack;
 import de.plixo.general.Color;

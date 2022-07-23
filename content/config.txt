@@ -1,4 +1,5 @@
-1875829276?java.lang.Boolean:true
--1898433106?java.lang.Float:5.4577465
+1875829276?java.lang.Boolean:false
+-1898433106?java.lang.Float:0.85365856
+69833?java.lang.Boolean:false
 130770065?java.lang.Boolean:false
 1264134838?java.lang.Boolean:true

@@ -1,13 +1,12 @@
-package de.plixo.ui.impl.elements;
+package de.plixo.impl.ui;
 
 import de.plixo.game.item.Item;
 import de.plixo.game.item.ItemStack;
-import de.plixo.general.reference.InterfaceReference;
 import de.plixo.ui.lib.elements.UIReference;
 import de.plixo.ui.lib.elements.layout.UIContext;
 import de.plixo.ui.lib.elements.layout.UIInvisible;
-import de.plixo.ui.lib.elements.layout.UIInvisibleRef;
 import de.plixo.ui.lib.elements.resources.UIButton;
+import de.plixo.ui.lib.elements.visuals.UIEmpty;
 import de.plixo.ui.lib.general.ColorLib;
 
 import java.awt.*;
@@ -21,8 +20,7 @@ public class UIItem extends UIReference<ItemStack> {
     public void setDimensions(float x, float y, float width, float height) {
         assert reference != null;
 
-
-        UIButton button = new UIButton();
+        UIEmpty button = new UIEmpty();
         button.setRoundness(0);
         button.scaleDimensions(width, height);
         button.setColor(0);
@@ -51,7 +49,7 @@ public class UIItem extends UIReference<ItemStack> {
 
             if (value != null) {
 
-                final var str = "x"+String.valueOf(value.amount());
+                final var str = "x"+ value.amount();
                 GUI.drawString(str, width - 2 - GUI.getStringWidth(str), 6, -1);
                 GUI.drawRoundedRect(2, height - 4, width - 2, height - 2, 13, ColorLib.getBackground(1f));
                 GUI.drawRoundedRect(2, height - 4, 2 + (width - 4) * value.durability(), height - 2, 13,

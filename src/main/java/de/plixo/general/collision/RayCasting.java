@@ -1,13 +1,15 @@
 package de.plixo.general.collision;
 
 import de.plixo.game.Block;
-import de.plixo.game.RenderObj;
 import de.plixo.game.Storage3D;
+import de.plixo.general.IO;
 import de.plixo.general.Tuple;
 import de.plixo.general.Util;
 import de.plixo.rendering.MeshBundle;
+import de.plixo.rendering.RenderObj;
+import de.plixo.state.Assets;
+import de.plixo.event.AssetServer;
 import de.plixo.systems.RenderSystem;
-import de.plixo.systems.WorldSystem;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
@@ -44,7 +46,8 @@ public class RayCasting {
         return best;
     }
 
-    public static Tuple<Block, @NotNull RayTraceResult> rayCastStorage(Storage3D<WorldSystem.RenderEntry<?>> renderStorage, @NotNull Vector3f origin, @NotNull Vector3f end) {
+    public static Tuple<Block, @NotNull RayTraceResult> rayCastStorage(Storage3D<Assets.RenderEntry<?>> renderStorage
+            , @NotNull Vector3f origin, @NotNull Vector3f end) {
         val bounds = new AABB(origin, end);
         val minX = Util.clamp((int) (bounds.minX - 1), renderStorage.size(), 0);
         val minY = Util.clamp((int) (bounds.minY - 1), renderStorage.size(), 0);
@@ -70,7 +73,7 @@ public class RayCasting {
                             if (hit.position().distanceSquared(origin) > minDst) {
                                 continue;
                             }
-                            val subMesh = rayCastBlockMesh(renderEntry.mesh(),
+                            val subMesh = rayCastBlockAABBS(block_.getCollisions(),
                                     new Vector3f(block_.veci()).add(0.5f, 0.5f, 0.5f),
                                     origin, end, false);
                             if (subMesh instanceof RayTraceHit hit2) {
@@ -90,14 +93,39 @@ public class RayCasting {
         return new Tuple<>(block, best);
     }
 
+    public static RayTraceResult rayCastBlockAABBS(@NotNull AABB[] meshes, @NotNull Vector3f offset,
+                                                   @NotNull Vector3f origin, @NotNull Vector3f end, boolean reverse) {
+        RayTraceResult best = new RayTraceMiss();
+        var minDst = Float.MAX_VALUE;
+
+        for (AABB aabb_ : meshes) {
+            val aabb = aabb_.offset(offset.x, offset.y, offset.z);
+            val rayTraceResult = aabb.calculateIntercept(origin, end, reverse);
+            if (rayTraceResult instanceof RayTraceHit hit) {
+                val distance = hit.position().distanceSquared(origin);
+                if (distance < minDst) {
+                    minDst = distance;
+                    best = hit;
+                }
+            }
+        }
+        if (reverse && best instanceof RayTraceHit hit) {
+            return new RayTraceHit(hit.face().opposite(), hit.position(), hit.collider());
+        }
+
+        return best;
+    }
+
     public static RayTraceResult rayCastWorld(@NotNull Vector3f origin, @NotNull Vector3f end) {
-        val reversed = RayCasting.rayCastBlockMesh(WorldSystem.INSTANCE.cubeMesh(), new Vector3f(), origin, end, true);
-        val start = RayCasting.rayCastBlockMesh(WorldSystem.INSTANCE.cubeMesh(), new Vector3f(), origin, end, false);
+        final var cube = AssetServer.get(Assets.BackgroundCube.class).bundle();
+        val reversed = RayCasting.rayCastBlockMesh(cube, new Vector3f(), origin, end, true);
+        val start = RayCasting.rayCastBlockMesh(cube, new Vector3f(), origin, end, false);
 
         EnumFacing face = null;
         Vector3f position = null;
         Block block = null;
 
+        final var renderStorage = AssetServer.get(Assets.RenderStorage.class).renderStorage();
         if (start instanceof RayTraceHit start_hit) {
 
             assert reversed instanceof RayTraceHit;
@@ -107,8 +135,7 @@ public class RayCasting {
             face = end_hit.face();
             position = new Vector3f(end_position);
             face.removeFromPlaneReversed(position, start_hit.collider());
-
-            val rayCast = RayCasting.rayCastStorage(WorldSystem.INSTANCE.renderStorage(), origin, end_position);
+            val rayCast = RayCasting.rayCastStorage(renderStorage, origin, end_position);
             if (rayCast.second instanceof RayTraceHit blockHit) {
                 assert rayCast.first != null;
                 face = blockHit.face();
@@ -135,16 +162,20 @@ public class RayCasting {
 //        var y = mul.y / mul.w;
 //        y *= -1;
 //        //* RenderSystem.UI_SCALE
-//        final float screen_x = (RenderSystem.INSTANCE.worldcanvas().width / 2.0f) + x * (RenderSystem.INSTANCE.worldcanvas().width / 2.0f);
-//        final float screen_y = (RenderSystem.INSTANCE.worldcanvas().height / 2.0f) + y * (RenderSystem.INSTANCE.worldcanvas().height / 2.0f);
+//        final float screen_x = (RenderSystem.INSTANCE.worldCanvas().width / 2.0f) + x * (RenderSystem.INSTANCE
+//        .worldCanvas().width / 2.0f);
+//        final float screen_y = (RenderSystem.INSTANCE.worldCanvas().height / 2.0f) + y * (RenderSystem.INSTANCE
+//        .worldCanvas().height / 2.0f);
 //        return new Vector2f(screen_x, screen_y);
         return null;
     }
 
     public static Tuple<Vector3f, Vector3f> screenToWorld(float x, float y) {
-        val xNDC = (2 * (x / (RenderSystem.INSTANCE.worldcanvas().width * RenderSystem.UI_SCALE)) - 1f);
-        val yNDC = (-2 * (y / (RenderSystem.INSTANCE.worldcanvas().height * RenderSystem.UI_SCALE)) + 1f);
-        val camera_inverse_matrix = (new Matrix4f(RenderSystem.INSTANCE.projView())).invert();
+        final var worldCanvas = AssetServer.get(Assets.WorldCanvas.class).worldCanvas();
+        final var matrix = AssetServer.get(Assets.ProjView.class).matrix();
+        val xNDC = (2 * (x / (worldCanvas.width * RenderSystem.UI_SCALE)) - 1f);
+        val yNDC = (-2 * (y / (worldCanvas.height * RenderSystem.UI_SCALE)) + 1f);
+        val camera_inverse_matrix = (new Matrix4f(matrix)).invert();
         val near = (new Vector4f(xNDC, yNDC, 0, 1)).mul(camera_inverse_matrix);
         val far = (new Vector4f(xNDC, yNDC, 1, 1)).mul(camera_inverse_matrix);
 
@@ -157,4 +188,9 @@ public class RayCasting {
     }
 
 
+    public static RayTraceResult raycast_camera() {
+        val dir_ = RayCasting.screenToWorld(IO.getCanvasMouse().x, IO.getCanvasMouse().y);
+        val forward = new Vector3f(dir_.first).add(new Vector3f(dir_.second).mul(1000f));
+        return RayCasting.rayCastWorld(dir_.first, forward);
+    }
 }
