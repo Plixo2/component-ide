@@ -15,17 +15,7 @@ public class UIState {
     @Accessors(fluent = true)
     static float delta_time;
 
-
     public static boolean firstRun = true;
     public static UIAlign debugList;
 
-
-    public static @NotNull ActionType action = ActionType.PLACE;
-
-
-    public enum ActionType {
-        PLACE,
-        EDIT,
-        INSPECT
-    }
 }

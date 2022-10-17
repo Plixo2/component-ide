@@ -3,7 +3,6 @@ package de.plixo.ui.lib.elements;
 
 import de.plixo.general.Color;
 import de.plixo.general.Util;
-import de.plixo.systems.RenderSystem;
 import de.plixo.ui.lib.general.ColorLib;
 import de.plixo.ui.lib.interfaces.IKeyboard;
 import de.plixo.ui.lib.interfaces.IMouse;
@@ -48,7 +47,6 @@ public abstract class UIElement implements IGuiEvent {
     boolean dragged = false;
 
     @Getter
-    @Setter
     boolean selected = false;
 
     @Getter
@@ -101,6 +99,15 @@ public abstract class UIElement implements IGuiEvent {
 
     public abstract void drawScreen(float mouseX, float mouseY);
 
+    public void onSelect() {
+
+    }
+
+    public void onSelectionLost() {
+
+    }
+
+
     protected void defaults(float mouseX, float mouseY) {
         defaultBackground();
         defaultOutline();
@@ -111,8 +118,7 @@ public abstract class UIElement implements IGuiEvent {
     protected void defaultUpdate(float mouseX, float mouseY) {
         updateHoverProgress(mouseX, mouseY);
         drawName(mouseX, mouseY);
-        if (isSelected())
-            drawOutline(selectionOutlineColor);
+        if (isSelected()) drawOutline(selectionOutlineColor);
     }
 
     protected void defaultHover() {
@@ -151,7 +157,7 @@ public abstract class UIElement implements IGuiEvent {
     }
 
     public void mouseClicked(float mouseX, float mouseY, int mouseButton) {
-        this.selected = this.isHovered(mouseX, mouseY);
+        setSelected(this.isHovered(mouseX, mouseY));
         if (isHovered(mouseX, mouseY)) {
             if (mouseButton == 0) {
                 dragged = true;
@@ -212,14 +218,15 @@ public abstract class UIElement implements IGuiEvent {
 
 
     private void drawName(@NotNull String name, int alignment) {
-        if(textShadow) {
+        if (textShadow) {
             if (alignment == -1) {
                 GUI.drawStringWithShadow(name, x + 3, y + height / 2, ColorLib.getTextColor());
             } else if (alignment == 1) {
                 GUI.drawStringWithShadow(name, x + width - (GUI.getStringWidth(name) + 3), y + height / 2,
                         ColorLib.getTextColor());
             } else {
-                GUI.drawCenteredStringWithShadow(name, x + width / 2, y + height / 2, ColorLib.getTextColor());
+                GUI.drawCenteredStringWithShadow(name, x + width / 2, y + height / 2,
+                        ColorLib.getTextColor());
             }
         } else {
             if (alignment == -1) {
@@ -247,7 +254,7 @@ public abstract class UIElement implements IGuiEvent {
     }
 
     public void scaleDimensions(UIElement element) {
-        scaleDimensions(element.width,element.height);
+        scaleDimensions(element.width, element.height);
     }
 
     public void scaleDimensions(float width, float height) {
@@ -263,7 +270,7 @@ public abstract class UIElement implements IGuiEvent {
     }
 
     public float aspect() {
-        return width/height;
+        return width / height;
     }
 
 
@@ -273,5 +280,14 @@ public abstract class UIElement implements IGuiEvent {
 
     public void disableTextShadow() {
         textShadow = false;
+    }
+
+    protected void setSelected(boolean b) {
+        if (b && !selected) {
+            onSelect();
+        } else if (!b && selected) {
+            onSelectionLost();
+        }
+        this.selected = b;
     }
 }

@@ -7,7 +7,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Dispatcher {
     static Map<Class<?>, List<EventReceiver>> receiver = new HashMap<>();
@@ -33,8 +36,7 @@ public class Dispatcher {
         final Class<?> clazz = object.getClass();
         for (Method method : clazz.getDeclaredMethods()) {
             if (method.getParameterCount() != 1 || !method.isAnnotationPresent(SubscribeEvent.class) ||
-                    Modifier.isStatic(method.getModifiers()))
-                continue;
+                    Modifier.isStatic(method.getModifiers())) continue;
 
             final Parameter parameter = method.getParameters()[0];
             final Class<?> input = parameter.getType();
@@ -42,8 +44,7 @@ public class Dispatcher {
             if (Event.class.isAssignableFrom(input)) {
                 method.setAccessible(true);
 
-                final List<EventReceiver> list =
-                        receiver.computeIfAbsent(input, u -> new ArrayList<>());
+                final List<EventReceiver> list = receiver.computeIfAbsent(input, u -> new ArrayList<>());
                 list.add(new EventReceiver(object, method));
             }
         }
@@ -52,8 +53,9 @@ public class Dispatcher {
     public static <T> void registerStatic(@NotNull Class<T> clazz) {
         for (Method method : clazz.getDeclaredMethods()) {
             if (method.getParameterCount() != 1 || !method.isAnnotationPresent(SubscribeEvent.class) ||
-                    !Modifier.isStatic(method.getModifiers()))
+                    !Modifier.isStatic(method.getModifiers())) {
                 continue;
+            }
 
 
             final Parameter parameter = method.getParameters()[0];
@@ -61,8 +63,8 @@ public class Dispatcher {
 
             if (Event.class.isAssignableFrom(input)) {
                 method.setAccessible(true);
-                final List<EventReceiver> list =
-                        receiver.computeIfAbsent(input, u -> new ArrayList<>());
+                final List<EventReceiver> list = receiver.computeIfAbsent(input, u -> new ArrayList<>());
+
                 list.add(new EventReceiver(null, method));
             }
         }

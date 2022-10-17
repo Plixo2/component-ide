@@ -1,10 +1,11 @@
 package de.plixo.ui.lib.general;
 
+import de.plixo.event.AssetServer;
 import de.plixo.event.SubscribeEvent;
 import de.plixo.event.impl.*;
 import de.plixo.general.IO;
+import de.plixo.state.Assets;
 import de.plixo.state.UIState;
-import de.plixo.systems.RenderSystem;
 import de.plixo.ui.impl.OpenGlRenderer;
 import de.plixo.ui.lib.elements.IGuiEvent;
 import de.plixo.ui.lib.elements.UIElement;
@@ -123,6 +124,7 @@ public class UIManager implements IGuiEvent {
         INSTANCE.stack.push(window);
         return window;
     }
+
     public static Window addPopUp(UICanvas canvas) {
         //enable translation
         val subCan = new UICanvas();
@@ -173,6 +175,9 @@ public class UIManager implements IGuiEvent {
         }
         stack.peek().internal.drawScreen(mouseX, mouseY);
         glDisable(GL_SCISSOR_TEST);
+
+        final int fps = AssetServer.get(Assets.Fps.class).fps();
+        UIElement.GUI.drawStringWithShadow(fps + " FPS", 5, height - 10, -1);
     }
 
     @Override
@@ -283,8 +288,7 @@ public class UIManager implements IGuiEvent {
     @SubscribeEvent
     static void key(@NotNull KeyEvent event) {
         assert INSTANCE != null;
-        if (event.action() == GLFW_PRESS)
-            INSTANCE.keyTyped((char) 0, event.key());
+        if (event.action() == GLFW_PRESS) INSTANCE.keyTyped((char) 0, event.key());
     }
 
     @SubscribeEvent

@@ -1,15 +1,11 @@
 package de.plixo;
 
-import de.plixo.general.FileUtil;
-import de.plixo.systems.ItemSystem;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.io.File;
-import java.nio.file.Path;
 import java.util.HashMap;
 
 
@@ -33,34 +29,34 @@ public class BufferTest {
 
     public static void main(String[] args) throws ReflectiveOperationException {
 
-
-        HashMap<Class<?>, Object> objects = new HashMap<>();
-        objects.put(Integer.class, 0);
-        objects.put(Float.class, 0f);
-        objects.put(Boolean.class, false);
-        objects.put(ItemSystem.class, new ItemSystem());
-
-
-        for (int j = 0; j < 10; j++) {
-            val ms = System.currentTimeMillis();
-            final float iter = 10000000f;
-            for (int i = 0; i < iter; i++) {
-                objects.get(Integer.class);
-                objects.get(Float.class);
-                objects.get(Boolean.class);
-                objects.get(ItemSystem.class);
-            }
-            final var time = System.currentTimeMillis() - ms;
-            System.out.println("Time: " + time);
-            System.out.println("for " + j);
-            System.out.println(time / iter + "ms per loop");
-        }
-
-        val ms = System.currentTimeMillis();
-        File fi = new File("content/");
-        forFile(fi);
-        final var time = System.currentTimeMillis() - ms;
-        System.out.println("Time: " + time + "ms");
+//
+//        HashMap<Class<?>, Object> objects = new HashMap<>();
+//        objects.put(Integer.class, 0);
+//        objects.put(Float.class, 0f);
+//        objects.put(Boolean.class, false);
+//        objects.put(ItemSystem.class, new ItemSystem());
+//
+//
+//        for (int j = 0; j < 10; j++) {
+//            val ms = System.currentTimeMillis();
+//            final float iter = 10000000f;
+//            for (int i = 0; i < iter; i++) {
+//                objects.get(Integer.class);
+//                objects.get(Float.class);
+//                objects.get(Boolean.class);
+//                objects.get(ItemSystem.class);
+//            }
+//            final var time = System.currentTimeMillis() - ms;
+//            System.out.println("Time: " + time);
+//            System.out.println("for " + j);
+//            System.out.println(time / iter + "ms per loop");
+//        }
+//
+//        val ms = System.currentTimeMillis();
+//        File fi = new File("content/");
+//        forFile(fi);
+//        final var time = System.currentTimeMillis() - ms;
+//        System.out.println("Time: " + time + "ms");
 
 
 //        FileUtils.eq

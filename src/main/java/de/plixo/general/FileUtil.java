@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
-import de.plixo.game.meta.MetaTest;
 import lombok.val;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -16,7 +15,6 @@ import org.plixo.gsonplus.GsonPlusConfig;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.function.Predicate;
 
@@ -33,8 +31,6 @@ public class FileUtil {
         GsonPlusConfig.setClassLoader(FileUtil.class.getClassLoader());
 
         GsonPlusConfig.addAdapter(Color.class, () -> new Color(0));
-        GsonPlusConfig.addAdapter(MetaTest.AbstractItem.class, () -> new MetaTest.AbstractItem(0,null));
-        GsonPlusConfig.addAdapter(MetaTest.AbstractItem2.class, () -> new MetaTest.AbstractItem2(0,null));
         GsonPlusConfig.addPrimitive(Vector3f.class, new GsonPlusConfig.IObjectValue<Vector3f>() {
             @Override
             public Object toObject(JsonElement jsonElement) {

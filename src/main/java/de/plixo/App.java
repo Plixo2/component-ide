@@ -1,19 +1,18 @@
 package de.plixo;
 
-import de.plixo.systems.AnimationSystem;
 import de.plixo.event.AssetServer;
 import de.plixo.event.Dispatcher;
 import de.plixo.event.impl.*;
-import de.plixo.rendering.Debug;
 import de.plixo.general.IO;
+import de.plixo.intermediate.UI;
+import de.plixo.intermediate.TokenRegistry;
 import de.plixo.state.Assets;
 import de.plixo.state.UIState;
-import de.plixo.systems.*;
-import de.plixo.ui.PlacePanel;
-import de.plixo.ui.UIInvTest;
+import de.plixo.systems.AnimationSystem;
+import de.plixo.systems.RenderSystem;
+import de.plixo.systems.UISystem;
 import de.plixo.ui.impl.GLFWMouse;
 import de.plixo.ui.impl.OpenGlRenderer;
-import de.plixo.systems.UISystem;
 import de.plixo.ui.lib.general.UIManager;
 import lombok.val;
 import org.lwjgl.Version;
@@ -31,28 +30,22 @@ public class App {
         Dispatcher.registerStatic(IO.class);
         Dispatcher.registerStatic(GLFWMouse.class);
         Dispatcher.registerStatic(OpenGlRenderer.class);
-        Dispatcher.registerStatic(MeshSystem.class);
-        Dispatcher.registerStatic(UISystem.class);
-        Dispatcher.registerStatic(AnimationSystem.class);
-        Dispatcher.registerStatic(PlacePanel.class);
         Dispatcher.registerStatic(UIManager.class);
-        Dispatcher.registerStatic(UIInvTest.class);
+        Dispatcher.registerStatic(UI.class);
+        Dispatcher.registerStatic(TokenRegistry.class);
 
-        AssetServer.insertAndRegister(new ItemSystem());
         AssetServer.insertAndRegister(new UISystem());
-        AssetServer.insertAndRegister(new InteractionSystem());
         AssetServer.insertAndRegister(new RenderSystem());
-        AssetServer.insertAndRegister(new WorldSystem());
         AssetServer.insertAndRegister(new AnimationSystem());
 
 
-        Dispatcher.registerStatic(Debug.class);
-
         Dispatcher.emit(new InitEvent());
-        Dispatcher.emit(new PostInitEvent());
         System.out.println("OpenGL " + glGetString(GL_VERSION));
+        Dispatcher.emit(new PostInitEvent());
         loop();
+        Dispatcher.emit(new SaveEvent());
         Dispatcher.emit(new ShutDownEvent());
+
     }
 
 
@@ -61,16 +54,17 @@ public class App {
             var lastFPS = System.currentTimeMillis();
             var fps_counter = 0;
             var last_ms = System.currentTimeMillis();
-            RenderSystem renderSystem = AssetServer.get(RenderSystem.class);
+            val renderSystem = AssetServer.get(RenderSystem.class);
             final var window = AssetServer.get(Assets.Window.class).id();
+            AssetServer.insert(new Assets.Fps(0));
             while (!glfwWindowShouldClose(window)) {
                 val time = System.currentTimeMillis();
                 val delta_time = time - last_ms;
                 val delta_time_seconds = delta_time / 1000f;
                 UIState.delta_time(delta_time_seconds);
 
-                if(time - lastFPS > 1000) {
-                    System.out.println(fps_counter + " FPS");
+                if (time - lastFPS > 1000) {
+                    AssetServer.update(new Assets.Fps(fps_counter));
                     fps_counter = 0;
                     lastFPS += 1000;
                 }
@@ -81,8 +75,6 @@ public class App {
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 glEnable(GL_DEPTH_TEST);
                 glEnable(GL_CULL_FACE);
-                renderSystem.setup3D();
-                Dispatcher.emit(new Render3DEvent(delta_time_seconds));
                 renderSystem.setup2D();
                 Dispatcher.emit(new Render2DEvent(delta_time_seconds));
 

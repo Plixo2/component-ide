@@ -1,14 +1,13 @@
 package de.plixo.ui.impl;
 
 import de.plixo.event.SubscribeEvent;
-import de.plixo.event.impl.Render3DEvent;
+import de.plixo.event.impl.Render2DEvent;
 import de.plixo.ui.lib.general.UIManager;
 import de.plixo.ui.lib.interfaces.IRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
 import org.lwjgl.opengl.GL11;
 
-import java.nio.FloatBuffer;
 import java.util.Stack;
 
 import static de.plixo.systems.RenderSystem.UI_SCALE;
@@ -17,7 +16,9 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class OpenGlRenderer implements IRenderer {
 
-    static float yOffset = 13;
+    static float yOffset = 9;
+    //verdana
+//    yOffset = 13;
     static FontRenderer font;
 
     public static void setFontRenderer(FontRenderer fontRenderer) {
@@ -61,8 +62,8 @@ public class OpenGlRenderer implements IRenderer {
             return;
         }
 
-        if (radius <= 1f) {
-            drawLinedRect(left, top, right, bottom, color, width);
+        if (radius <= 0.5f) {
+            // drawLinedRect(left, top, right, bottom, color, width);
             return;
         }
 
@@ -81,16 +82,22 @@ public class OpenGlRenderer implements IRenderer {
         }
         radius = Math.min((left - right) / 2, Math.min((top - bottom) / 2, radius));
 
+        set(color);
+        glEnable(GL_LINE_SMOOTH);
+        glLineWidth(width);
+
         circleLinedSection(left - radius, top - radius, radius, color, 0, 45, width);
         circleLinedSection(left - radius, bottom + radius, radius, color, 45, 90, width);
         circleLinedSection(right + radius, top - radius, radius, color, 135, 180, width);
         circleLinedSection(right + radius, bottom + radius, radius, color, 90, 135, width);
+
 
         drawLine(left - radius, top, right + radius, top, color, width);
         drawLine(left - radius, bottom, right + radius, bottom, color, width);
         drawLine(left, top - radius, left, bottom + radius, color, width);
         drawLine(right, top - radius, right, bottom + radius, color, width);
 
+        reset();
     }
 
     @Override
@@ -280,26 +287,28 @@ public class OpenGlRenderer implements IRenderer {
         reset();
     }
 
+    float toRadiant = (float) (Math.PI / 90);
+
     @Override
     public void circleLinedSection(float x, float y, float radius, int color, int from, int to, float width) {
         if (color == 0) {
             return;
         }
 
-        set(color);
-        glEnable(GL_LINE_SMOOTH);
-        glLineWidth(width);
 
         glBegin(GL_LINES);
         int i = from;
-        float toRadiant = (float) (Math.PI / 90);
+
+//        glVertex2d(x + Math.sin(from * toRadiant) * radius, y + Math.cos(from * toRadiant) * radius);
         while (i < to) {
             glVertex2d(x + Math.sin(i * toRadiant) * radius, y + Math.cos(i * toRadiant) * radius);
             i += 9;
             glVertex2d(x + Math.sin(i * toRadiant) * radius, y + Math.cos(i * toRadiant) * radius);
         }
+//        glVertex2d(x + Math.sin(to * toRadiant) * radius, y + Math.cos(to * toRadiant) * radius);
+
         glEnd();
-        reset();
+//        reset();
     }
 
     public static void set(int color) {
@@ -374,10 +383,7 @@ public class OpenGlRenderer implements IRenderer {
 
 
         float bottomY = (UIManager.INSTANCE.getHeight() * UI_SCALE) - y2;
-        glScissor(Math.round(x),
-                Math.round(bottomY),
-                Math.round(wDiff),
-                Math.round(hDiff));
+        glScissor(Math.round(x), Math.round(bottomY), Math.round(wDiff), Math.round(hDiff));
 
 
     }
@@ -467,7 +473,7 @@ public class OpenGlRenderer implements IRenderer {
     }
 
     @SubscribeEvent
-    static void renderEvent(@NotNull Render3DEvent event) {
+    static void renderEvent(@NotNull Render2DEvent event) {
         delta = (long) (event.delta() * 1000);
     }
 

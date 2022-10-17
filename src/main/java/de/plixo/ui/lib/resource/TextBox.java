@@ -207,10 +207,12 @@ public class TextBox {
                     internalString = prefix + middle;
                 } else if (cursor1 >= 1) {
                     cursor1 = Util.clamp(cursor1, internalString.length(), 0);
-                    final String prefix = internalString.substring(0, cursor1 - 1);
-                    final String suffix = internalString.substring(cursor1);
-                    internalString = prefix + suffix;
-                    cursor1 -= 1;
+                    if (cursor1 >= 1) {
+                        final String prefix = internalString.substring(0, cursor1 - 1);
+                        final String suffix = internalString.substring(cursor1);
+                        internalString = prefix + suffix;
+                        cursor1 -= 1;
+                    }
                 }
                 selection = false;
                 selectionWidth = 0;

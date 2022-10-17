@@ -1,7 +1,7 @@
 package de.plixo.ui.impl;
 
 
-import de.plixo.rendering.targets.Texture;
+import de.plixo.rendering.Texture;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

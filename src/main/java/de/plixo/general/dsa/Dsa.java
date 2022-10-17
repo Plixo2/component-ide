@@ -3,7 +3,7 @@ package de.plixo.general.dsa;
 
 import com.moandjiezana.toml.Toml;
 import de.plixo.general.Tuple;
-import de.plixo.rendering.targets.Shader;
+import de.plixo.rendering.Shader;
 import lombok.val;
 
 import java.io.File;

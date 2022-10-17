@@ -19,7 +19,6 @@ public class UICanvas extends UIElement {
     public boolean scissor = false;
 
 
-
     public UICanvas() {
         init();
     }
@@ -132,5 +131,14 @@ public class UICanvas extends UIElement {
         }
     }
 
+
+    public <T extends UIElement> T create(Class<? extends T> cls) {
+        try {
+            final T obj = (T) cls.getConstructors()[0].newInstance();
+            return add(obj);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

@@ -81,8 +81,7 @@ public class UINumber extends UIReference<Float> {
 
     @Override
     public void mouseReleased(float mouseX, float mouseY, int mouseButton) {
-        final boolean notSelected = !isSelected();
-        if (notSelected) {
+        if (!isSelected()) {
             internalRef.setValue(format.format(reference.getValue()));
         } else {
             final String value = internalRef.getValue();
@@ -94,11 +93,14 @@ public class UINumber extends UIReference<Float> {
         }
         super.mouseReleased(mouseX, mouseY, mouseButton);
         this.setSelected(this.isHovered(mouseX, mouseY));
-        if (isSelected() && notSelected) {
-            box.setCursor1(1000);
-            box.setCursorDelay(500);
-        }
     }
+
+    @Override
+    public void onSelect() {
+        box.setCursor1(1000);
+        box.setCursorDelay(500);
+    }
+
 
     @Override
     public void setDimensions(float x, float y, float width, float height) {
