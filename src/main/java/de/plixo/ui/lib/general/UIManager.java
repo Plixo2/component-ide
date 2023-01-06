@@ -21,6 +21,7 @@ import java.util.Stack;
 
 import static de.plixo.systems.RenderSystem.UI_SCALE;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_REPEAT;
 import static org.lwjgl.opengl.GL11.*;
 
 public class UIManager implements IGuiEvent {
@@ -182,10 +183,10 @@ public class UIManager implements IGuiEvent {
 
     @Override
     public void keyTyped(char typedChar, int keyCode) {
-        if (keyCode == UIElement.KEYBOARD.KEY_ESCAPE()) {
-            closeWindow();
-            return;
-        }
+        //if (keyCode == UIElement.KEYBOARD.KEY_ESCAPE()) {
+        //    closeWindow();
+        //  //  return;
+        //}
         if (stack.isEmpty()) {
             return;
         }
@@ -288,7 +289,8 @@ public class UIManager implements IGuiEvent {
     @SubscribeEvent
     static void key(@NotNull KeyEvent event) {
         assert INSTANCE != null;
-        if (event.action() == GLFW_PRESS) INSTANCE.keyTyped((char) 0, event.key());
+        boolean shouldFire = event.action() == GLFW_PRESS || (UIState.allowKeyRepeats && event.action() == GLFW_REPEAT);
+        if (shouldFire) INSTANCE.keyTyped((char) 0, event.key());
     }
 
     @SubscribeEvent

@@ -15,11 +15,11 @@ import org.jetbrains.annotations.Nullable;
 public class TextBox {
     @Getter
     @Nullable Reference<String> reference;
-    @NotNull IRenderer renderer;
+    @Nullable IRenderer renderer;
     @NotNull IKeyboard keyboard;
-    float x, y, width, height;
+    public float x, y, width, height;
 
-    public TextBox(@Nullable Reference<String> reference, @NotNull IRenderer renderer,
+    public TextBox(@Nullable Reference<String> reference, @Nullable IRenderer renderer,
                    @NotNull IKeyboard keyboard, float x, float y, float width, float height) {
         this.reference = reference;
         this.renderer = renderer;
@@ -48,12 +48,16 @@ public class TextBox {
     private int cursorDelay = 0;
 
     public void drawScreen(boolean isFocused) {
+        if (renderer == null) {
+            return;
+        }
         if (reference == null) {
             return;
         }
         internalString = reference.getValue();
         if (!isFocused) {
             renderer.drawString(internalString, x, y + height / 2, textColor);
+            selection = false;
             return;
         }
 

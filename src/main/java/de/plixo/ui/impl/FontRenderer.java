@@ -24,7 +24,6 @@ public class FontRenderer {
 
     private final int textureWidth = 1024;
 
-
     private final int textureHeight = 1024;
 
     private final Font font;
@@ -99,7 +98,6 @@ public class FontRenderer {
 
 
         try {
-
             final BufferedImage imgTemp =
                     new BufferedImage(textureWidth, textureHeight, BufferedImage.TYPE_INT_ARGB);
             final Graphics2D g = (Graphics2D) imgTemp.getGraphics();
@@ -111,14 +109,10 @@ public class FontRenderer {
             int positionX = 0;
             int positionY = 0;
 
-
             for (int i = 0; i < 256; i++) {
                 char ch = (char) i;
-
                 final BufferedImage fontImage = getFontImage(ch);
-
                 final Metric newMetric = new Metric();
-
                 newMetric.width = fontImage.getWidth();
                 newMetric.height = fontImage.getHeight();
 
@@ -127,28 +121,23 @@ public class FontRenderer {
                     positionY += rowHeight;
                     rowHeight = 0;
                 }
-
                 newMetric.uvX = positionX;
                 newMetric.uvY = positionY;
 
                 if (newMetric.height > fontHeight) {
                     fontHeight = newMetric.height;
                 }
-
                 if (newMetric.height > rowHeight) {
                     rowHeight = newMetric.height;
                 }
 
                 g.drawImage(fontImage, positionX, positionY, null);
                 positionX += newMetric.width + 4;
-
-
                 charArray[i] = newMetric;
             }
 
             fontTexture = Texture.fromBufferedImg(imgTemp);
             fontTexture.seal();
-
 
         } catch (Exception e) {
             System.err.println("Failed to create font.");

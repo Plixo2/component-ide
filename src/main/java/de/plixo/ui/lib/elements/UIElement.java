@@ -3,6 +3,7 @@ package de.plixo.ui.lib.elements;
 
 import de.plixo.general.Color;
 import de.plixo.general.Util;
+import de.plixo.ui.lib.elements.layout.UICanvas;
 import de.plixo.ui.lib.general.ColorLib;
 import de.plixo.ui.lib.interfaces.IKeyboard;
 import de.plixo.ui.lib.interfaces.IMouse;
@@ -289,5 +290,9 @@ public abstract class UIElement implements IGuiEvent {
             onSelectionLost();
         }
         this.selected = b;
+    }
+
+    public void addTo(@NotNull UICanvas canvas) {
+        canvas.add(this);
     }
 }

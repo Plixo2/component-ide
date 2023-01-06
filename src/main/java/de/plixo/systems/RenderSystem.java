@@ -73,7 +73,7 @@ public class RenderSystem {
 
     @SubscribeEvent
     void postInit(@NotNull PostInitEvent event) {
-        OpenGlRenderer.setFontRenderer(new FontRenderer(new Font("Consolas", Font.PLAIN, 20)));
+        OpenGlRenderer.setFontRenderer(new FontRenderer(new Font("Consolas", Font.PLAIN, 14)));
         new LodestoneUI(new OpenGlRenderer(), new GLFWKeyboard(), new GLFWMouse());
         Dispatcher.emit(new ResizeEvent(new Vector2i(unscaled_width, unscaled_height)));
     }
@@ -101,6 +101,7 @@ public class RenderSystem {
         UIManager.INSTANCE = new UIManager(scaled_width, scaled_height);
         val win = UIManager.displayWindow("Main");
         win.getCanvas().setColor(0);
+        win.getCanvas().setHoverColor(0);
 
         Dispatcher.emit(new UIInitEvent(win.getCanvas()));
         Dispatcher.emit(new UIChildEvent(win.getCanvas()));

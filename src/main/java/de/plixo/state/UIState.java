@@ -18,4 +18,6 @@ public class UIState {
     public static boolean firstRun = true;
     public static UIAlign debugList;
 
+    public static boolean allowKeyRepeats = true;
+
 }

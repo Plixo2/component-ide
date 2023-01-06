@@ -19,4 +19,8 @@ public class Icon {
         this.texture.tex_parameter(GL_TEXTURE_MAG_FILTER,GL_LINEAR);
         this.texture.seal();
     }
+
+    public void draw(float x, float y, float size) {
+        this.texture.drawStatic(x, y, x + size, y + size, 0, 0, 1, 1, -1);
+    }
 }

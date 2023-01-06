@@ -31,7 +31,9 @@ public class UISystem {
     @SubscribeEvent
     void ui(@NotNull UIInitEvent event) {
         final UICanvas canvas = event.canvas();
-
+        if (true) {
+            return;
+        }
         //debug
         {
             UIAlign align = new UIAlign();

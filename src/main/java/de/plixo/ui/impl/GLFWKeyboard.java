@@ -40,32 +40,28 @@ public class GLFWKeyboard implements IKeyboard {
 
     @Override
     public boolean isCtrlKeyDown() {
-        return IO.keyDown(KEY_LCONTROL());
+        return IO.keyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || IO.keyDown(GLFW.GLFW_KEY_RIGHT_CONTROL);
     }
 
     @Override
     public boolean isAltKeyDown() {
-        return IO.keyDown(GLFW.GLFW_KEY_LEFT_ALT);
+        return IO.keyDown(GLFW.GLFW_KEY_LEFT_ALT) || IO.keyDown(GLFW.GLFW_KEY_RIGHT_ALT);
     }
 
     @Override
     public boolean isShiftKeyDown() {
-        return IO.keyDown(GLFW.GLFW_KEY_LEFT_SHIFT);
+        return IO.keyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || IO.keyDown(GLFW.GLFW_KEY_RIGHT_SHIFT);
     }
 
     @Override
     public String getClipboardString() {
-        try
-        {
-            Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents((Object)null);
+        try {
+            Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents((Object) null);
 
-            if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.stringFlavor))
-            {
-                return (String)transferable.getTransferData(DataFlavor.stringFlavor);
+            if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                return (String) transferable.getTransferData(DataFlavor.stringFlavor);
             }
-        }
-        catch (Exception var1)
-        {
+        } catch (Exception var1) {
             ;
         }
 
@@ -74,15 +70,11 @@ public class GLFWKeyboard implements IKeyboard {
 
     @Override
     public void setClipboardString(String copyText) {
-        if (copyText != null && copyText.length() > 0)
-        {
-            try
-            {
+        if (copyText != null && copyText.length() > 0) {
+            try {
                 StringSelection stringselection = new StringSelection(copyText);
-                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringselection, (ClipboardOwner)null);
-            }
-            catch (Exception var2)
-            {
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringselection, (ClipboardOwner) null);
+            } catch (Exception var2) {
                 ;
             }
         }
@@ -90,8 +82,7 @@ public class GLFWKeyboard implements IKeyboard {
 
 
     @Override
-    public boolean isAllowedTextCharacter(char character)
-    {
+    public boolean isAllowedTextCharacter(char character) {
         final boolean b = character != 167 && character >= 32 && character != 127;
         return b;
     }
@@ -101,10 +92,8 @@ public class GLFWKeyboard implements IKeyboard {
 
         StringBuilder stringbuilder = new StringBuilder();
 
-        for (char c0 : input.toCharArray())
-        {
-            if (isAllowedTextCharacter(c0))
-            {
+        for (char c0 : input.toCharArray()) {
+            if (isAllowedTextCharacter(c0)) {
                 stringbuilder.append(c0);
             }
         }
@@ -113,7 +102,7 @@ public class GLFWKeyboard implements IKeyboard {
 
     @Override
     public String getKeyName(int i) {
-        return GLFW.glfwGetKeyName(i,0);
+        return GLFW.glfwGetKeyName(i, 0);
     }
 
     @Override
