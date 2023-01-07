@@ -4,7 +4,6 @@ import de.plixo.event.AssetServer;
 import de.plixo.event.Dispatcher;
 import de.plixo.event.impl.*;
 import de.plixo.general.IO;
-import de.plixo.intermediate.UI;
 import de.plixo.intermediate.TokenRegistry;
 import de.plixo.state.Assets;
 import de.plixo.state.UIState;

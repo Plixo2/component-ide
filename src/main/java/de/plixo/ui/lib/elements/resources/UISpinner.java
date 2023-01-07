@@ -6,12 +6,18 @@ import de.plixo.general.reference.Reference;
 import de.plixo.ui.lib.elements.UIReference;
 import de.plixo.ui.lib.general.ColorLib;
 import de.plixo.ui.lib.resource.TextBox;
+import lombok.Getter;
+import lombok.Setter;
 
 public class UISpinner extends UIReference<Integer> {
 
     public UISpinner() {
         setColor(ColorLib.getBackground(0.6f));
     }
+
+    @Setter
+    @Getter
+    int scrollSpeed = 1;
 
     @Override
     public void setDimensions(float x, float y, float width, float height) {
@@ -42,10 +48,12 @@ public class UISpinner extends UIReference<Integer> {
         super.setDimensions(x, y, width, height);
     }
 
-    public static class UISpinnerProxy extends UIReference<Integer> {
+    public class UISpinnerProxy extends UIReference<Integer> {
         TextBox box;
 
         Reference<String> internalRef = new ObjectReference<>();
+
+
 
         @Override
         public void init() {
@@ -73,7 +81,7 @@ public class UISpinner extends UIReference<Integer> {
             if (isDragged()) {
                 if (Math.abs(delta) > 10) {
                     assert reference != null;
-                    reference.setValue((int) (reference.getValue() - Math.signum(delta)));
+                    reference.setValue((int) (reference.getValue() - Math.signum(delta) * scrollSpeed));
                     this.last = mouseX;
                 }
             } else {

@@ -1,6 +1,7 @@
 package de.plixo.ui.lib.elements.resources;
 
 
+import de.plixo.general.Color;
 import de.plixo.general.Util;
 import de.plixo.ui.lib.elements.UIReference;
 import de.plixo.ui.lib.general.ColorLib;
@@ -48,19 +49,16 @@ public class UIScrollBar extends UIReference<Float> {
         }
 
 
-        GUI.drawRoundedRect(x, y, x + this.width, y + height, 100, getColor());
 
 
         float percent = Util.clampFloat((reference.getValue() - min) / (max - min), 1, 0);
+        GUI.drawRoundedRect(x, y, x + this.width, y + height, 100, getColor());
 
         float cur = upperBound + (lowerBound - upperBound) * percent;
         GUI.drawRoundedRect(x, cur - draggableHeight, x + this.width, cur + draggableHeight, 100,
                 ColorLib.getBackground(0.1f));
         GUI.drawRoundedRect(x +1, cur - draggableHeight + 2, x + this.width - 1, cur + draggableHeight - 2, 100,
                 ColorLib.getMainColor(percent));
-
-
-
     }
 
     public void setDragerHeight(float draggableHeight) {

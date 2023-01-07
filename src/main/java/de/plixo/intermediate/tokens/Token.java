@@ -1,6 +1,6 @@
 package de.plixo.intermediate.tokens;
 
-import de.plixo.intermediate.Icon;
+import de.plixo.ui.lib.general.Icon;
 
 public abstract class Token {
     public static int CTRL = 0x10000000;

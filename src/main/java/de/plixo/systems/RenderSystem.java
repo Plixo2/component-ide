@@ -26,6 +26,7 @@ import java.awt.*;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20C.glUseProgram;
 import static org.lwjgl.opengl.GL30.*;
@@ -73,7 +74,7 @@ public class RenderSystem {
 
     @SubscribeEvent
     void postInit(@NotNull PostInitEvent event) {
-        OpenGlRenderer.setFontRenderer(new FontRenderer(new Font("Consolas", Font.PLAIN, 14)));
+        OpenGlRenderer.setFontRenderer(new FontRenderer(new Font("Verdana", Font.BOLD, 14)));
         new LodestoneUI(new OpenGlRenderer(), new GLFWKeyboard(), new GLFWMouse());
         Dispatcher.emit(new ResizeEvent(new Vector2i(unscaled_width, unscaled_height)));
     }

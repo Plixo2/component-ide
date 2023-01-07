@@ -24,6 +24,11 @@ public class UITextBox extends UIReference<String> {
         GUI.pushMatrix();
         startScissor();
         GUI.translate(x, y);
+
+        if (!isSelected() && onLoss) {
+            assert box.getReference() != null;
+            box.getReference().setValue(reference.getValue());
+        }
         box.drawScreen(isSelected());
         endScissor();
         GUI.popMatrix();
@@ -52,6 +57,7 @@ public class UITextBox extends UIReference<String> {
         box.setCursor1(1000);
         box.setCursorDelay(500);
     }
+
 
     @Override
     public void onSelectionLost() {

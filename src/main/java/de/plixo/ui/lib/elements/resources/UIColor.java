@@ -1,6 +1,7 @@
 package de.plixo.ui.lib.elements.resources;
 
 import de.plixo.general.Color;
+import de.plixo.general.reference.InterfaceReference;
 import de.plixo.general.reference.ObjectReference;
 import de.plixo.general.reference.Reference;
 import de.plixo.ui.lib.elements.UIElement;
@@ -23,10 +24,10 @@ public class UIColor extends UIReference<Color> {
 
         setOnTick(() -> {
             val color = reference.getValue();
-            red.setValue(color.red() / 255f);
-            green.setValue(color.green() / 255f);
-            blue.setValue(color.blue() / 255f);
-            alpha.setValue(color.alpha() / 255f);
+            red.setValue((float)color.red());
+            green.setValue((float)color.green());
+            blue.setValue((float)color.blue());
+            alpha.setValue((float)color.alpha());
         });
 
 
@@ -36,76 +37,92 @@ public class UIColor extends UIReference<Color> {
             val fillBar = new UIFillBar();
             fillBar.setReference(red);
             fillBar.setDraggable(true);
+            fillBar.setMin(0);
+            fillBar.setMax(255);
             fillBar.setDimensions(0, 0, width - h * 3 - padding, h);
             fillBar.primaryColor(new Color(0xFFFF2B39));
+            fillBar.fadeColor(new Color(0xFFFF2B39));
             fillBar.fade(false);
             this.add(fillBar);
 
-            val number = new UINumber();
-            number.setReference(red);
+            val number = new UISpinner();
+            number.setScrollSpeed(6);
+            number.setReference(new InterfaceReference<>(ref -> red.setValue((float)(int)ref), () -> (int)(float)red.getValue()));
             number.setDimensions(width - h * 3, 0, h * 3, h);
             this.add(number);
 
             red.addObserver(a -> {
                 val value = reference.getValue();
-                value.overwrite(new Color((int) (a * 255), value.green(), value.blue(), value.alpha()).rgba());
+                value.overwrite(new Color((int) (float)(a), value.green(), value.blue(), value.alpha()).rgba());
             });
         }
         {
             val fillBar = new UIFillBar();
             fillBar.setReference(green);
             fillBar.setDraggable(true);
+            fillBar.setMin(0);
+            fillBar.setMax(255);
             fillBar.setDimensions(0, h, width - h * 3 - padding, h);
             fillBar.primaryColor(new Color(0xFF2BFF4F));
+            fillBar.fadeColor(new Color(0xFF2BFF4F));
             fillBar.fade(false);
             this.add(fillBar);
 
-            val number = new UINumber();
-            number.setReference(green);
+            val number = new UISpinner();
+            number.setScrollSpeed(6);
+            number.setReference(new InterfaceReference<>(ref -> green.setValue((float)(int)ref), () -> (int)(float)green.getValue()));
             number.setDimensions(width - h * 3, h, h * 3, h);
             this.add(number);
 
             green.addObserver(a -> {
                 val value = reference.getValue();
-                value.overwrite(new Color(value.red(), (int) (a * 255), value.blue(), value.alpha()).rgba());
+                value.overwrite(new Color(value.red(), (int) (float)(a), value.blue(), value.alpha()).rgba());
             });
         }
         {
             val fillBar = new UIFillBar();
             fillBar.setReference(blue);
             fillBar.setDraggable(true);
+            fillBar.setMin(0);
+            fillBar.setMax(255);
             fillBar.setDimensions(0, h * 2, width - h * 3 - padding, h);
             fillBar.primaryColor(new Color(0xFF2B7EFF));
+            fillBar.fadeColor(new Color(0xFF2B7EFF));
             fillBar.fade(false);
             this.add(fillBar);
 
-            val number = new UINumber();
-            number.setReference(blue);
+            val number = new UISpinner();
+            number.setScrollSpeed(6);
+            number.setReference(new InterfaceReference<>(ref -> blue.setValue((float)(int)ref), () -> (int)(float)blue.getValue()));
             number.setDimensions(width - h * 3, h * 2, h * 3, h);
             this.add(number);
 
             blue.addObserver(a -> {
                 val value = reference.getValue();
-                value.overwrite(new Color(value.red(), value.green(), (int) (a * 255), value.alpha()).rgba());
+                value.overwrite(new Color(value.red(), value.green(), (int) (float)(a), value.alpha()).rgba());
             });
         }
         {
             val fillBar = new UIFillBar();
             fillBar.setReference(alpha);
             fillBar.setDraggable(true);
+            fillBar.setMin(0);
+            fillBar.setMax(255);
             fillBar.setDimensions(0, h * 3, width - h * 3 - padding, h);
-            fillBar.primaryColor(new Color(ColorLib.getBackground(1f)));
+            fillBar.primaryColor(new Color(0xFFBBCCDD));
+            fillBar.fadeColor(new Color(0xFFBBCCDD));
             fillBar.fade(false);
             this.add(fillBar);
 
-            val number = new UINumber();
-            number.setReference(alpha);
+            val number = new UISpinner();
+            number.setScrollSpeed(6);
+            number.setReference(new InterfaceReference<>(ref -> alpha.setValue((float)(int)ref), () -> (int)(float)alpha.getValue()));
             number.setDimensions(width - h * 3, h * 3, h * 3, h);
             this.add(number);
 
             alpha.addObserver(a -> {
                 val value = reference.getValue();
-                value.overwrite(new Color(value.red(), value.green(), value.blue(), (int) (a * 255)).rgba());
+                value.overwrite(new Color(value.red(), value.green(), value.blue(), (int) (float)(a)).rgba());
             });
         }
 

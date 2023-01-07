@@ -16,7 +16,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class OpenGlRenderer implements IRenderer {
 
-    static float yOffset = 9;
+    static float yOffset = 10;
     //verdana
 //    yOffset = 13;
     static FontRenderer font;

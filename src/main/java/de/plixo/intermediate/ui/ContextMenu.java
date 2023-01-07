@@ -1,9 +1,7 @@
 package de.plixo.intermediate.ui;
 
-import de.plixo.intermediate.Icon;
-import lombok.AllArgsConstructor;
+import de.plixo.ui.lib.general.Icon;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

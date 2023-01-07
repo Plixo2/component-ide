@@ -1,6 +1,6 @@
 package de.plixo.intermediate.tokens;
 
-import de.plixo.intermediate.Icon;
+import de.plixo.ui.lib.general.Icon;
 import org.lwjgl.glfw.GLFW;
 
 public class Equals extends Token {

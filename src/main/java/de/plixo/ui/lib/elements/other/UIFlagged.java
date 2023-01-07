@@ -1,5 +1,6 @@
-package de.plixo.intermediate;
+package de.plixo.ui.lib.elements.other;
 
+import de.plixo.intermediate.Flagged;
 import de.plixo.ui.lib.elements.State;
 import de.plixo.ui.lib.elements.layout.UICanvas;
 import org.jetbrains.annotations.NotNull;

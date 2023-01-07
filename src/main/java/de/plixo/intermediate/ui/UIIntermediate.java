@@ -2,7 +2,7 @@ package de.plixo.intermediate.ui;
 
 import de.plixo.general.reference.ExposedReference;
 import de.plixo.general.reference.ObjectReference;
-import de.plixo.intermediate.Icon;
+import de.plixo.ui.lib.general.Icon;
 import de.plixo.ui.lib.elements.layout.UICanvas;
 import de.plixo.ui.lib.general.ColorLib;
 import de.plixo.ui.lib.interfaces.IRenderer;
@@ -16,8 +16,6 @@ import org.joml.Vector2f;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 
 public class UIIntermediate extends UICanvas {
 

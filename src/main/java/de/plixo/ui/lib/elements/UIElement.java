@@ -87,6 +87,9 @@ public abstract class UIElement implements IGuiEvent {
     @Setter
     boolean textShadow = true;
 
+    @Getter
+    @Setter
+    int textColor = ColorLib.getTextColor();
 
     public UIElement() {
         super();
@@ -221,22 +224,19 @@ public abstract class UIElement implements IGuiEvent {
     private void drawName(@NotNull String name, int alignment) {
         if (textShadow) {
             if (alignment == -1) {
-                GUI.drawStringWithShadow(name, x + 3, y + height / 2, ColorLib.getTextColor());
+                GUI.drawStringWithShadow(name, x + 3, y + height / 2, textColor);
             } else if (alignment == 1) {
-                GUI.drawStringWithShadow(name, x + width - (GUI.getStringWidth(name) + 3), y + height / 2,
-                        ColorLib.getTextColor());
+                GUI.drawStringWithShadow(name, x + width - (GUI.getStringWidth(name) + 3), y + height / 2, textColor);
             } else {
-                GUI.drawCenteredStringWithShadow(name, x + width / 2, y + height / 2,
-                        ColorLib.getTextColor());
+                GUI.drawCenteredStringWithShadow(name, x + width / 2, y + height / 2, textColor);
             }
         } else {
             if (alignment == -1) {
-                GUI.drawString(name, x + 3, y + height / 2, ColorLib.getTextColor());
+                GUI.drawString(name, x + 3, y + height / 2, textColor);
             } else if (alignment == 1) {
-                GUI.drawString(name, x + width - (GUI.getStringWidth(name) + 3), y + height / 2,
-                        ColorLib.getTextColor());
+                GUI.drawString(name, x + width - (GUI.getStringWidth(name) + 3), y + height / 2, textColor);
             } else {
-                GUI.drawCenteredString(name, x + width / 2, y + height / 2, ColorLib.getTextColor());
+                GUI.drawCenteredString(name, x + width / 2, y + height / 2, textColor);
             }
         }
 

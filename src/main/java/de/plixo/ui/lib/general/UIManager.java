@@ -265,13 +265,11 @@ public class UIManager implements IGuiEvent {
     }
 
 
-    static int fps = 0;
 
     @SubscribeEvent
     static void tick(@NotNull TickEvent event) {
         assert INSTANCE != null;
         INSTANCE.onTick();
-        fps = Math.round(1f / UIState.delta_time());
     }
 
     @SubscribeEvent

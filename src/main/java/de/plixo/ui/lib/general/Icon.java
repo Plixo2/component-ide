@@ -1,4 +1,4 @@
-package de.plixo.intermediate;
+package de.plixo.ui.lib.general;
 
 import de.plixo.rendering.Texture;
 import lombok.SneakyThrows;

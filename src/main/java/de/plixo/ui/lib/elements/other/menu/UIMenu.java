@@ -42,6 +42,7 @@ public class UIMenu extends UICanvas {
         align.add(uiElement);
         align.pack();
         align.enableScissor();
+        align.height = Math.min(maxHeight, align.height);
         popup.add(align);
         popup.pack();
         popup.setOutlineColor(ColorLib.getMainColor(1));

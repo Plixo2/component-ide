@@ -3,6 +3,7 @@ package de.plixo.general.reference;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 
@@ -12,7 +13,7 @@ public class FieldReference<O> extends InterfaceReference<O> {
     @NotNull
     final Field field;
 
-    public FieldReference(@NotNull Field field, final @NotNull Object object) {
+    public FieldReference(@NotNull Field field, final @Nullable Object object) {
         super(s -> {
             try {
                 field.set(object, s);

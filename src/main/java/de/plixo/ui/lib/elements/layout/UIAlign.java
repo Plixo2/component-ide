@@ -12,7 +12,7 @@ public class UIAlign extends UICanvas {
 
     @Getter
     @Setter
-    private float percent = 0;
+    private float scrollPercent = 0;
     private float offset = 0;
 
     private int direction = VERTICAL;
@@ -37,18 +37,18 @@ public class UIAlign extends UICanvas {
                 final float v = getMax() - (direction == VERTICAL ? height : width);
                 float size = (MOUSE.getDXWheel() * 6f) / v;
 
-                percent = Util.clampFloat(percent - size, 1, 0);
+                scrollPercent = Util.clampFloat(scrollPercent - size, 1, 0);
             }
         }
         offset = 0;
         if (direction == VERTICAL) {
             if (getMax() > height && canScroll) {
                 float maxDiff = getMax() - height;
-                offset = maxDiff * percent;
+                offset = maxDiff * scrollPercent;
             }
         } else if (getMax() > width && canScroll) {
             float maxDiff = getMax() - width;
-            offset = maxDiff * percent;
+            offset = maxDiff * scrollPercent;
         }
 
         if (direction == VERTICAL) {

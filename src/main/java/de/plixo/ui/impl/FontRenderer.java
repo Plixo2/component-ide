@@ -213,8 +213,9 @@ public class FontRenderer {
                 final int height = metric.height;
                 if ((i >= startIndex) || (i <= endIndex)) {
                     if (shadow) {
-                        fontTexture.drawStatic((x + totalWidth) + 3, y + 3, (x + totalWidth + width) + 3,
-                                (y + height) + 3,
+                        var shadowOffset = 2;
+                        fontTexture.drawStatic((x + totalWidth) + shadowOffset, y + shadowOffset, (x + totalWidth + width) + shadowOffset,
+                                (y + height) + shadowOffset,
                                 metric.uvX / (float) textureWidth,
                                 metric.uvY / (float) textureHeight,
                                 (metric.uvX + width) / (float) textureWidth,
